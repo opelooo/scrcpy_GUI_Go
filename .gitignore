@@ -1,0 +1,17 @@
+# Binaries & Distributions
+scrcpy-gui
+scrcpy-gui.exe
+*.exe
+dist/
+
+# Logs & Temporary files
+*.log
+scrcpy_record_*
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.idea/
+.vscode/

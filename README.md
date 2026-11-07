@@ -1,0 +1,72 @@
+# Minimal GUI Scrcpy (Go Version)
+
+A lightweight, modern graphical user interface for [scrcpy](https://github.com/Genymobile/scrcpy) written in **Go** using [Fyne v2](https://fyne.io). Rewritten from the original Java/Swing GUI into a standalone native binary without requiring a Java Runtime Environment (JRE).
+
+---
+
+## Features
+
+- **Zero JRE Dependency**: Built as a native compiled binary for fast startup and low memory footprint.
+- **Automatic Tool Detection**: Automatically detects `adb` and `scrcpy` from system `PATH` or the executable's folder.
+- **Device Management**:
+  - Automatically queries and lists connected Android devices (`adb devices`).
+  - Double-click an attached device to immediately launch `scrcpy`.
+  - Right-click context menu on any device:
+    - **Show Device Info**: Displays device manufacturer and model.
+    - **Show Device IP**: Displays device Wi-Fi IP address.
+- **Quick Action Buttons**:
+  - **Refresh**: Rescans for attached devices.
+  - **Info**: Shows device hardware details.
+  - **Run**: Launches `scrcpy` with all selected options.
+  - **TCP/IP**: Automates wireless connection over Wi-Fi (`adb tcpip 5555` $\rightarrow$ `adb connect <ip>:5555` $\rightarrow$ `scrcpy`).
+- **Customizable Options**:
+  - **Video Bit Rate**: Slider and text field synced from 1M to 50M (default: `2M`).
+  - **Max Mirroring Size**: Input field (default: `1024`).
+  - **Toggles**:
+    - Video On / Off (`--no-video`)
+    - Turn Screen On / Off (`--turn-screen-off`)
+    - Stay Awake (`--stay-awake`)
+  - **Recording**:
+    - Record Video (`mp4`, `mkv`)
+    - Record Audio (`m4a`, `wav`, `flac`, `opus`, `aac`, `mka`)
+- **Dark Theme**: Clean, modern dark UI styling.
+
+---
+
+## Prerequisites
+
+1. Install [scrcpy](https://github.com/Genymobile/scrcpy) and `adb`:
+   - **Linux (Ubuntu/Debian)**:
+     ```bash
+     sudo apt install scrcpy adb
+     ```
+   - **Windows**:
+     Download the official scrcpy release containing `adb.exe` and `scrcpy.exe`. Put `scrcpy-gui.exe` in the same folder or add scrcpy to system `PATH`.
+
+---
+
+## Build & Run
+
+### Linux
+```bash
+# Run tests
+make test
+
+# Build binary into dist/scrcpy-gui
+make build
+
+# Run application
+./dist/scrcpy-gui
+```
+
+### Windows (Cross-compilation using Zig)
+```bash
+make build-windows
+# Binary created at dist/scrcpy-gui.exe
+```
+
+---
+
+## License
+
+GPL-3.0 License. See [LICENSE](LICENSE) for details.

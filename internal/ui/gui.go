@@ -1,4 +1,4 @@
-package main
+package ui
 
 import (
 	"fmt"
@@ -11,6 +11,8 @@ import (
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
+
+	"github.com/opelooo/scrcpy_GUI_Go/internal/domain"
 )
 
 // clickableLabel provides primary selection, double tap to run, and right click context menu.
@@ -73,15 +75,16 @@ func (l *clickableLabel) TappedSecondary(e *fyne.PointEvent) {
 	widget.NewPopUpMenu(menu, l.canvas).ShowAtPosition(e.AbsolutePosition)
 }
 
+// GUI manages the graphical user interface.
 type GUI struct {
-	app    fyne.App
-	window fyne.Window
-	runner *ADBRunner
+	app     fyne.App
+	window  fyne.Window
+	service domain.DeviceService
 
-	devices        []string
+	devices        []domain.Device
 	selectedDevice string
 
-	// UI controls
+	// UI widgets
 	deviceList       *widget.List
 	currDeviceLabel  *widget.Label
 	bitRateEntry     *widget.Entry
@@ -96,11 +99,12 @@ type GUI struct {
 	audioFormatCombo *widget.Select
 }
 
-func NewGUI(a fyne.App, w fyne.Window, runner *ADBRunner) *GUI {
+// NewGUI constructs the GUI and sets up the layout.
+func NewGUI(a fyne.App, w fyne.Window, svc domain.DeviceService) *GUI {
 	g := &GUI{
-		app:    a,
-		window: w,
-		runner: runner,
+		app:     a,
+		window:  w,
+		service: svc,
 	}
 	g.buildUI()
 	g.refreshDevices()
@@ -108,7 +112,6 @@ func NewGUI(a fyne.App, w fyne.Window, runner *ADBRunner) *GUI {
 }
 
 func (g *GUI) buildUI() {
-	// Selected device label
 	g.currDeviceLabel = widget.NewLabelWithStyle("No Device Selected", fyne.TextAlignLeading, fyne.TextStyle{Bold: true})
 
 	// Device List widget
@@ -122,14 +125,14 @@ func (g *GUI) buildUI() {
 		func(id widget.ListItemID, o fyne.CanvasObject) {
 			if id < len(g.devices) {
 				lbl := o.(*clickableLabel)
-				lbl.serial = g.devices[id]
-				lbl.SetText(g.devices[id])
+				lbl.serial = g.devices[id].Serial
+				lbl.SetText(g.devices[id].Serial)
 			}
 		},
 	)
 	g.deviceList.OnSelected = func(id widget.ListItemID) {
 		if id >= 0 && id < len(g.devices) {
-			g.selectDevice(g.devices[id])
+			g.selectDevice(g.devices[id].Serial)
 		}
 	}
 
@@ -259,7 +262,7 @@ func (g *GUI) buildUI() {
 
 func (g *GUI) selectDeviceBySerial(serial string) {
 	for i, d := range g.devices {
-		if d == serial {
+		if d.Serial == serial {
 			g.deviceList.Select(i)
 			return
 		}
@@ -277,7 +280,7 @@ func (g *GUI) selectDevice(serial string) {
 }
 
 func (g *GUI) refreshDevices() {
-	devices, err := g.runner.ListDevices()
+	devices, err := g.service.ListDevices()
 	if err != nil {
 		dialog.ShowError(err, g.window)
 		return
@@ -286,7 +289,7 @@ func (g *GUI) refreshDevices() {
 	g.deviceList.Refresh()
 
 	if len(g.devices) > 0 {
-		g.selectDevice(g.devices[0])
+		g.selectDevice(g.devices[0].Serial)
 		g.deviceList.Select(0)
 	} else {
 		g.selectDevice("")
@@ -298,7 +301,7 @@ func (g *GUI) showDeviceInfo(serial string) {
 		dialog.ShowInformation("Info", "Please select device", g.window)
 		return
 	}
-	info, err := g.runner.GetDeviceInfo(serial)
+	info, err := g.service.GetDeviceInfo(serial)
 	if err != nil {
 		dialog.ShowError(err, g.window)
 		return
@@ -312,7 +315,7 @@ func (g *GUI) showDeviceIP(serial string) {
 		dialog.ShowInformation("Info", "Please select device", g.window)
 		return
 	}
-	ip, err := g.runner.GetDeviceIP(serial)
+	ip, err := g.service.GetDeviceIP(serial)
 	if err != nil {
 		dialog.ShowError(err, g.window)
 		return
@@ -327,7 +330,7 @@ func (g *GUI) runScrcpy() {
 		return
 	}
 
-	opts := ScrcpyOptions{
+	opts := domain.ScrcpyOptions{
 		DeviceSerial: g.selectedDevice,
 		MaxSize:      g.maxSizeEntry.Text,
 		BitRate:      g.bitRateEntry.Text,
@@ -351,7 +354,7 @@ func (g *GUI) runScrcpy() {
 	progress.Show()
 
 	go func() {
-		err := g.runner.RunScrcpy(opts)
+		err := g.service.LaunchScrcpy(opts)
 		time.Sleep(1200 * time.Millisecond)
 		progress.Hide()
 		if err != nil {
@@ -377,13 +380,12 @@ func (g *GUI) connectTCPIP() {
 	progress.Show()
 
 	go func() {
-		err := g.runner.ConnectTCPIP(g.selectedDevice)
+		err := g.service.ConnectTCPIP(g.selectedDevice)
 		time.Sleep(1500 * time.Millisecond)
 		progress.Hide()
 		if err != nil {
 			dialog.ShowError(err, g.window)
 		} else {
-			// Refresh list after wireless connection
 			time.Sleep(500 * time.Millisecond)
 			g.refreshDevices()
 		}

@@ -1,12 +1,13 @@
 # Minimal GUI Scrcpy (Go Version)
 
-A lightweight, modern graphical user interface for [scrcpy](https://github.com/Genymobile/scrcpy) written in **Go** using [Fyne v2](https://fyne.io). Rewritten from the original Java/Swing GUI into a standalone native binary without requiring a Java Runtime Environment (JRE).
+A lightweight, modern graphical user interface for [scrcpy](https://github.com/Genymobile/scrcpy) written in **Go** using [Fyne v2](https://fyne.io). Rewritten from the original Java/Swing GUI into a standalone native binary following standard Go project architecture conventions (`cmd/`, `internal/domain`, `internal/service`, `internal/platform`, `internal/ui`).
 
 ---
 
 ## Features
 
-- **Zero JRE Dependency**: Built as a native compiled binary for fast startup and low memory footprint.
+- **Zero JRE Dependency**: Built as a native compiled binary with fast startup and low memory footprint.
+- **Idiomatic Go Architecture**: Separation of concerns with thin entry point, clean domain interfaces, and service orchestration.
 - **Automatic Tool Detection**: Automatically detects `adb` and `scrcpy` from system `PATH` or the executable's folder.
 - **Device Management**:
   - Automatically queries and lists connected Android devices (`adb devices`).
@@ -33,6 +34,38 @@ A lightweight, modern graphical user interface for [scrcpy](https://github.com/G
 
 ---
 
+## Project Structure
+
+```text
+.
+├── cmd/
+│   └── scrcpy-gui/           # Thin entry point (flag parsing, wiring, startup)
+│       ├── icon.png          # Embedded application icon
+│       ├── lib/              # Dynamic library linker scripts for CGO on Linux
+│       └── main.go
+├── internal/
+│   ├── domain/               # Domain models (Device, ScrcpyOptions) & interfaces
+│   │   └── device.go
+│   ├── platform/             # Low-level integrations & drivers
+│   │   └── adb/              # ADB & Scrcpy CLI executor & output parsers
+│   │       ├── client.go
+│   │       ├── parser.go
+│   │       └── parser_test.go
+│   ├── service/              # Use-case business logic orchestrator
+│   │   ├── scrcpy_service.go
+│   │   └── scrcpy_service_test.go
+│   └── ui/                   # Fyne UI presentation layer
+│       ├── gui.go
+│       └── gui_test.go
+├── dist/                     # Compiled binaries
+├── Makefile                  # Build, test, and package runner
+├── go.mod
+├── go.sum
+└── README.md
+```
+
+---
+
 ## Prerequisites
 
 1. Install [scrcpy](https://github.com/Genymobile/scrcpy) and `adb`:
@@ -49,8 +82,9 @@ A lightweight, modern graphical user interface for [scrcpy](https://github.com/G
 
 ### Linux
 ```bash
-# Run tests
+# Run tests & static analysis
 make test
+make vet
 
 # Build binary into dist/scrcpy-gui
 make build

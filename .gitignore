@@ -1,6 +1,6 @@
 # Binaries & Distributions
-scrcpy-gui
-scrcpy-gui.exe
+/scrcpy-gui
+/scrcpy-gui.exe
 *.exe
 dist/
 

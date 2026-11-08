@@ -7,6 +7,18 @@ import (
 )
 
 func (g *GUI) initVideoWidgets() {
+	g.videoSourceCombo = widget.NewSelect([]string{"display (default)", "camera"}, nil)
+	g.videoSourceCombo.SetSelected("display (default)")
+
+	g.cameraFacingCombo = widget.NewSelect([]string{"front", "back", "external"}, nil)
+	g.cameraFacingCombo.SetSelected("front")
+
+	g.cameraSizeEntry = widget.NewEntry()
+	g.cameraSizeEntry.SetPlaceHolder("e.g. 1920x1080")
+
+	g.cameraFPSCombo = widget.NewSelect([]string{"Default", "60", "30"}, nil)
+	g.cameraFPSCombo.SetSelected("Default")
+
 	g.videoCodecCombo = widget.NewSelect([]string{"default", "h264", "h265", "av1", "vp8", "vp9"}, nil)
 	g.videoCodecCombo.SetSelected("default")
 
@@ -32,7 +44,45 @@ func (g *GUI) initVideoWidgets() {
 	g.noPlaybackCheck.SetChecked(false)
 }
 
-func (g *GUI) buildVideoEngineTab() *fyne.Container {
+func (g *GUI) buildCameraRows() []fyne.CanvasObject {
+	srcRow := container.NewBorder(
+		nil, nil,
+		widget.NewLabel("video source:"),
+		container.NewGridWrap(fyne.NewSize(180, 36), g.videoSourceCombo),
+		nil,
+	)
+	facingRow := container.NewBorder(
+		nil, nil,
+		widget.NewLabel("camera facing:"),
+		container.NewGridWrap(fyne.NewSize(180, 36), g.cameraFacingCombo),
+		nil,
+	)
+	sizeRow := container.NewBorder(
+		nil, nil,
+		widget.NewLabel("camera size:"),
+		container.NewGridWrap(fyne.NewSize(180, 36), g.cameraSizeEntry),
+		nil,
+	)
+	return []fyne.CanvasObject{srcRow, facingRow, sizeRow}
+}
+
+func (g *GUI) buildV4L2Rows() []fyne.CanvasObject {
+	sinkRow := container.NewBorder(
+		nil, nil,
+		widget.NewLabel("v4l2 sink:"),
+		container.NewGridWrap(fyne.NewSize(180, 36), g.v4l2SinkEntry),
+		nil,
+	)
+	bufRow := container.NewBorder(
+		nil, nil,
+		widget.NewLabel("v4l2 buffer:"),
+		container.NewGridWrap(fyne.NewSize(180, 36), g.v4l2BufferEntry),
+		nil,
+	)
+	return []fyne.CanvasObject{sinkRow, bufRow}
+}
+
+func (g *GUI) buildVideoSettingsRows() []fyne.CanvasObject {
 	codecRow := container.NewBorder(
 		nil, nil,
 		widget.NewLabel("video codec:"),
@@ -63,28 +113,15 @@ func (g *GUI) buildVideoEngineTab() *fyne.Container {
 		container.NewGridWrap(fyne.NewSize(180, 36), g.cropEntry),
 		nil,
 	)
-	v4l2SinkRow := container.NewBorder(
-		nil, nil,
-		widget.NewLabel("v4l2 sink:"),
-		container.NewGridWrap(fyne.NewSize(180, 36), g.v4l2SinkEntry),
-		nil,
-	)
-	v4l2BufRow := container.NewBorder(
-		nil, nil,
-		widget.NewLabel("v4l2 buffer:"),
-		container.NewGridWrap(fyne.NewSize(180, 36), g.v4l2BufferEntry),
-		nil,
-	)
-
-	return container.NewVBox(
-		codecRow,
-		fpsRow,
-		orientRow,
-		bufRow,
-		cropRow,
-		v4l2SinkRow,
-		v4l2BufRow,
-		g.noPlaybackCheck,
-	)
+	return []fyne.CanvasObject{codecRow, fpsRow, orientRow, bufRow, cropRow}
 }
 
+func (g *GUI) buildVideoEngineTab() fyne.CanvasObject {
+	items := make([]fyne.CanvasObject, 0, 12)
+	items = append(items, g.buildCameraRows()...)
+	items = append(items, g.buildVideoSettingsRows()...)
+	items = append(items, g.buildV4L2Rows()...)
+	items = append(items, g.noPlaybackCheck)
+
+	return container.NewVScroll(container.NewVBox(items...))
+}

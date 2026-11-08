@@ -38,14 +38,18 @@ type GUI struct {
 	audioFormatCombo *widget.Select
 
 	// Video Engine widgets
-	videoCodecCombo  *widget.Select
-	maxFPSCombo      *widget.Select
-	orientationCombo *widget.Select
-	videoBufferEntry *widget.Entry
-	cropEntry        *widget.Entry
-	v4l2SinkEntry    *widget.Entry
-	v4l2BufferEntry  *widget.Entry
-	noPlaybackCheck  *widget.Check
+	videoSourceCombo  *widget.Select
+	cameraFacingCombo *widget.Select
+	cameraSizeEntry   *widget.Entry
+	cameraFPSCombo    *widget.Select
+	videoCodecCombo   *widget.Select
+	maxFPSCombo       *widget.Select
+	orientationCombo  *widget.Select
+	videoBufferEntry  *widget.Entry
+	cropEntry         *widget.Entry
+	v4l2SinkEntry     *widget.Entry
+	v4l2BufferEntry   *widget.Entry
+	noPlaybackCheck   *widget.Check
 
 	// Audio Engine widgets
 	audioOnCheck         *widget.Check

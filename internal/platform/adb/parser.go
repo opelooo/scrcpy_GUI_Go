@@ -104,6 +104,12 @@ func appendVideoAdvancedArgs(args []string, opts domain.ScrcpyOptions) []string 
 	if crop := strings.TrimSpace(opts.Crop); crop != "" {
 		args = append(args, fmt.Sprintf("--crop=%s", crop))
 	}
+	if sink := strings.TrimSpace(opts.V4L2Sink); sink != "" {
+		args = append(args, fmt.Sprintf("--v4l2-sink=%s", sink))
+	}
+	if vbuf := strings.TrimSuffix(strings.TrimSpace(opts.V4L2Buffer), "ms"); vbuf != "" {
+		args = append(args, fmt.Sprintf("--v4l2-buffer=%s", vbuf))
+	}
 	return args
 }
 

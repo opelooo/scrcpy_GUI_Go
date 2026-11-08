@@ -64,6 +64,8 @@ type ScrcpyOptions struct {
 	NoClipboardAutosync  bool
 	LegacyPaste          bool
 	PushTarget           string
+	V4L2Sink             string
+	V4L2Buffer           string
 }
 
 // ADBClient defines the low-level ADB/scrcpy integration interface.

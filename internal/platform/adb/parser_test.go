@@ -221,3 +221,34 @@ func TestBuildScrcpyArgsControlDisabled(t *testing.T) {
 		t.Errorf("expected args to contain --no-control, got %q", joined)
 	}
 }
+
+func TestBuildScrcpyArgsV4L2Features(t *testing.T) {
+	opts := domain.ScrcpyOptions{
+		DeviceSerial: "DEV_V4L2",
+		V4L2Sink:     "/dev/video2",
+		V4L2Buffer:   "50ms",
+	}
+
+	args := BuildScrcpyArgs(opts)
+	joined := strings.Join(args, " ")
+	expected := []string{"--v4l2-sink=/dev/video2", "--v4l2-buffer=50"}
+	for _, sub := range expected {
+		if !strings.Contains(joined, sub) {
+			t.Errorf("expected args to contain %q, but got %q", sub, joined)
+		}
+	}
+}
+
+func TestBuildScrcpyArgsV4L2Empty(t *testing.T) {
+	opts := domain.ScrcpyOptions{
+		DeviceSerial: "DEV_V4L2",
+		V4L2Sink:     "",
+		V4L2Buffer:   "",
+	}
+
+	args := BuildScrcpyArgs(opts)
+	joined := strings.Join(args, " ")
+	if strings.Contains(joined, "--v4l2-sink") || strings.Contains(joined, "--v4l2-buffer") {
+		t.Errorf("expected args not to contain v4l2 flags, got %q", joined)
+	}
+}

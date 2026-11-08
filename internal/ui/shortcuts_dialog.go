@@ -68,11 +68,11 @@ func buildShortcutRow(it domain.ShortcutItem) fyne.CanvasObject {
 
 	return container.NewBorder(
 		nil, nil,
-		container.NewGridWrap(fyne.NewSize(200, 32), actionLabel),
+		container.NewGridWrap(fyne.NewSize(180, 32), actionLabel),
 		nil,
 		container.NewBorder(
 			nil, nil,
-			container.NewGridWrap(fyne.NewSize(230, 32), keyLabel),
+			container.NewGridWrap(fyne.NewSize(330, 32), keyLabel),
 			nil,
 			descLabel,
 		),
@@ -88,11 +88,11 @@ func buildCategoryTable(items []domain.ShortcutItem) fyne.CanvasObject {
 
 	header := container.NewBorder(
 		nil, nil,
-		container.NewGridWrap(fyne.NewSize(200, 32), headerAction),
+		container.NewGridWrap(fyne.NewSize(180, 32), headerAction),
 		nil,
 		container.NewBorder(
 			nil, nil,
-			container.NewGridWrap(fyne.NewSize(230, 32), headerKey),
+			container.NewGridWrap(fyne.NewSize(330, 32), headerKey),
 			nil,
 			headerDesc,
 		),
@@ -138,7 +138,7 @@ func (g *GUI) showShortcutsCheatsheetDialog() {
 	content := container.NewBorder(headerLabel, nil, nil, nil, tabs)
 
 	dlg := dialog.NewCustom("scrcpy Shortcuts Cheatsheet", "Close", content, g.window)
-	dlg.Resize(fyne.NewSize(840, 520))
+	dlg.Resize(fyne.NewSize(960, 480))
 	dlg.Show()
 }
 

@@ -48,8 +48,8 @@ func main() {
 		w.SetIcon(appIcon)
 	}
 
-	w.Resize(fyne.NewSize(870, 420))
-	w.SetFixedSize(true)
+	w.Resize(fyne.NewSize(1060, 560))
+	w.SetFixedSize(false)
 
 	// Dependency wiring
 	client, err := adb.NewClient()

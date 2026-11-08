@@ -145,7 +145,9 @@ func (g *GUI) startDeviceWatcher() {
 			g.mu.Unlock()
 
 			if changed {
-				g.setDevices(devs)
+				fyne.Do(func() {
+					g.setDevices(devs)
+				})
 			}
 		}
 	}

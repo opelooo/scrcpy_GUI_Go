@@ -99,10 +99,12 @@ func (g *GUI) runScrcpy() {
 	go func() {
 		err := g.service.LaunchScrcpy(opts)
 		time.Sleep(1200 * time.Millisecond)
-		progress.Hide()
-		if err != nil {
-			dialog.ShowError(err, g.window)
-		}
+		fyne.Do(func() {
+			progress.Hide()
+			if err != nil {
+				dialog.ShowError(err, g.window)
+			}
+		})
 	}()
 }
 
@@ -125,13 +127,15 @@ func (g *GUI) connectTCPIP() {
 	go func() {
 		err := g.service.ConnectTCPIP(g.selectedDevice)
 		time.Sleep(1500 * time.Millisecond)
-		progress.Hide()
-		if err != nil {
-			dialog.ShowError(err, g.window)
-		} else {
-			dialog.ShowInformation("Success", "Wireless scrcpy launched!", g.window)
-			g.refreshDevices()
-		}
+		fyne.Do(func() {
+			progress.Hide()
+			if err != nil {
+				dialog.ShowError(err, g.window)
+			} else {
+				dialog.ShowInformation("Success", "Wireless scrcpy launched!", g.window)
+				g.refreshDevices()
+			}
+		})
 	}()
 }
 
@@ -149,11 +153,13 @@ func (g *GUI) disconnectDevice(target string) {
 	go func() {
 		err := g.service.DisconnectDevice(target)
 		time.Sleep(500 * time.Millisecond)
-		progress.Hide()
-		if err != nil {
-			dialog.ShowError(err, g.window)
-		} else {
-			g.refreshDevices()
-		}
+		fyne.Do(func() {
+			progress.Hide()
+			if err != nil {
+				dialog.ShowError(err, g.window)
+			} else {
+				g.refreshDevices()
+			}
+		})
 	}()
 }

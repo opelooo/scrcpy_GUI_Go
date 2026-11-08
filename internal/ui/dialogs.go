@@ -90,13 +90,15 @@ func (g *GUI) showConnectIPDialog() {
 				ForceReconnect: forceCheck.Checked,
 			})
 			time.Sleep(1200 * time.Millisecond)
-			progress.Hide()
-			if err != nil {
-				dialog.ShowError(err, g.window)
-			} else {
-				time.Sleep(500 * time.Millisecond)
-				g.refreshDevices()
-			}
+			fyne.Do(func() {
+				progress.Hide()
+				if err != nil {
+					dialog.ShowError(err, g.window)
+				} else {
+					time.Sleep(500 * time.Millisecond)
+					g.refreshDevices()
+				}
+			})
 		}()
 	}, g.window)
 
@@ -149,13 +151,15 @@ func (g *GUI) showPairDialog() {
 				Code: code,
 			})
 			time.Sleep(1200 * time.Millisecond)
-			progress.Hide()
-			if err != nil {
-				dialog.ShowError(err, g.window)
-			} else {
-				dialog.ShowInformation("Pairing Successful", "Device paired successfully! Now connect via port 5555.", g.window)
-				g.refreshDevices()
-			}
+			fyne.Do(func() {
+				progress.Hide()
+				if err != nil {
+					dialog.ShowError(err, g.window)
+				} else {
+					dialog.ShowInformation("Pairing Successful", "Device paired successfully! Now connect via port 5555.", g.window)
+					g.refreshDevices()
+				}
+			})
 		}()
 	}, g.window)
 

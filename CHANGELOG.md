@@ -52,3 +52,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Audio forwarding controls: Audio ON/OFF, Audio source, Audio codec, Audio bitrate.
 - Control engine: Keyboard mode, Mouse mode, Gamepad mode, Read-only mode.
 - Linux and Windows cross-platform installation scripts (`install.sh`, `install.bat`, `Makefile`).
+

@@ -1,0 +1,52 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build & Release Binaries
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+
+      - name: Install Linux Build Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgl1-mesa-dev xorg-dev libasound2-dev
+
+      - name: Build Linux Binary
+        run: |
+          mkdir -p dist
+          CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o dist/scrcpy-gui-linux-amd64 ./cmd/scrcpy-gui
+
+      - name: Set up Zig for Windows Cross-Compilation
+        uses: mlugg/setup-zig@v1
+        with:
+          version: 0.13.0
+
+      - name: Build Windows Binary
+        run: |
+          CGO_ENABLED=1 GOOS=windows GOARCH=amd64 CC="zig cc -target x86_64-windows-gnu" CXX="zig c++ -target x86_64-windows-gnu" go build -ldflags="-s -w -H windowsgui" -o dist/scrcpy-gui-windows-amd64.exe ./cmd/scrcpy-gui
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/scrcpy-gui-linux-amd64
+            dist/scrcpy-gui-windows-amd64.exe
+          body_path: CHANGELOG.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

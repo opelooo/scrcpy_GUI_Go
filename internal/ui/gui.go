@@ -115,7 +115,7 @@ func (g *GUI) buildUI() {
 		container.NewHBox(
 			container.NewGridWrap(fyne.NewSize(230, 360), leftPanel),
 			container.NewGridWrap(fyne.NewSize(125, 360), buttonPanel),
-			container.NewGridWrap(fyne.NewSize(450, 360), optionsPanel),
+			container.NewGridWrap(fyne.NewSize(480, 360), optionsPanel),
 		),
 	)
 

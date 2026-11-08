@@ -45,7 +45,7 @@ func (g *GUI) buildControlTab() *fyne.Container {
 	pushRow := container.NewBorder(
 		nil, nil,
 		widget.NewLabel("push target:"),
-		container.NewGridWrap(fyne.NewSize(150, 36), g.pushTargetEntry),
+		container.NewGridWrap(fyne.NewSize(180, 36), g.pushTargetEntry),
 		nil,
 	)
 
@@ -59,3 +59,4 @@ func (g *GUI) buildControlTab() *fyne.Container {
 		g.legacyPasteCheck,
 	)
 }
+

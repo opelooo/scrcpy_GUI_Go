@@ -51,7 +51,7 @@ func (g *GUI) buildAudioEngineTab() *fyne.Container {
 	bufRow := container.NewBorder(
 		nil, nil,
 		widget.NewLabel("audio buffer:"),
-		container.NewGridWrap(fyne.NewSize(150, 36), g.audioBufferEntry),
+		container.NewGridWrap(fyne.NewSize(180, 36), g.audioBufferEntry),
 		nil,
 	)
 

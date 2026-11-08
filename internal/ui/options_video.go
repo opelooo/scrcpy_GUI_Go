@@ -48,13 +48,13 @@ func (g *GUI) buildVideoEngineTab() *fyne.Container {
 	bufRow := container.NewBorder(
 		nil, nil,
 		widget.NewLabel("video buffer:"),
-		container.NewGridWrap(fyne.NewSize(150, 36), g.videoBufferEntry),
+		container.NewGridWrap(fyne.NewSize(180, 36), g.videoBufferEntry),
 		nil,
 	)
 	cropRow := container.NewBorder(
 		nil, nil,
 		widget.NewLabel("screen crop:"),
-		container.NewGridWrap(fyne.NewSize(150, 36), g.cropEntry),
+		container.NewGridWrap(fyne.NewSize(180, 36), g.cropEntry),
 		nil,
 	)
 

@@ -44,6 +44,15 @@ func (d *dummyService) LaunchScrcpy(opts domain.ScrcpyOptions) error {
 	return nil
 }
 
+func (d *dummyService) GetScrcpyCapabilities() (domain.ScrcpyCapabilities, error) {
+	return domain.ScrcpyCapabilities{
+		VersionRaw: "scrcpy 3.3.4",
+		Major:      3,
+		Minor:      3,
+		Patch:      4,
+	}, nil
+}
+
 func TestGUIInitialization(t *testing.T) {
 	app := test.NewApp()
 	w := app.NewWindow("Test")
@@ -134,5 +143,16 @@ func TestGUIInitialization(t *testing.T) {
 	}
 	if gui.pushTargetEntry.Text != "/sdcard/Download/" {
 		t.Errorf("expected default push target to be /sdcard/Download/, got %s", gui.pushTargetEntry.Text)
+	}
+
+	// Verify device features and backward compatibility
+	if !gui.screenOnCheck.Checked {
+		t.Errorf("expected screenOnCheck to be checked initially")
+	}
+	if gui.showTouchesCheck.Checked {
+		t.Errorf("expected showTouchesCheck to be unchecked initially")
+	}
+	if gui.keepActiveCheck.Visible() {
+		t.Errorf("expected keepActiveCheck to be hidden on scrcpy 3.3.4")
 	}
 }

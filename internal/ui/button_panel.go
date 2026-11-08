@@ -88,6 +88,12 @@ func (g *GUI) collectScrcpyOptions() domain.ScrcpyOptions {
 		NoKeyRepeat:         g.noKeyRepeatCheck.Checked,
 		ShortcutMod:         g.shortcutModCombo.Selected,
 		OTGMode:             g.otgModeCheck.Checked,
+		ShowTouches:         g.showTouchesCheck.Checked,
+		PowerOffOnClose:     g.powerOffOnCloseCheck.Checked,
+		NoPowerOn:           g.noPowerOnCheck.Checked,
+		KeepActive:          g.keepActiveCheck.Visible() && g.keepActiveCheck.Checked,
+		ScreenOffTimeout:    g.screenOffTimeoutEntry.Text,
+		StartApp:            g.startAppEntry.Text,
 	}
 }
 

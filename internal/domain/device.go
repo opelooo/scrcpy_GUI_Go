@@ -76,6 +76,21 @@ type ScrcpyOptions struct {
 	ShortcutMod          string
 	OTGMode              bool
 	GamepadMode          string
+	ShowTouches          bool
+	PowerOffOnClose      bool
+	NoPowerOn            bool
+	ScreenOffTimeout     string
+	StartApp             string
+	KeepActive           bool
+}
+
+// ScrcpyCapabilities defines supported scrcpy binary capabilities for backward compatibility.
+type ScrcpyCapabilities struct {
+	VersionRaw    string
+	Major         int
+	Minor         int
+	Patch         int
+	HasKeepActive bool
 }
 
 // ADBClient defines the low-level ADB/scrcpy integration interface.
@@ -89,6 +104,7 @@ type ADBClient interface {
 	Disconnect(target string) error
 	Pair(ip string, port int, code string) error
 	ExecuteScrcpy(args []string) error
+	GetScrcpyCapabilities() (ScrcpyCapabilities, error)
 }
 
 // DeviceService defines business use-cases for device management and mirroring.
@@ -101,4 +117,5 @@ type DeviceService interface {
 	PairDevice(opts PairOptions) error
 	DisconnectDevice(target string) error
 	LaunchScrcpy(opts ScrcpyOptions) error
+	GetScrcpyCapabilities() (ScrcpyCapabilities, error)
 }

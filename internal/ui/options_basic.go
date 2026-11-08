@@ -38,12 +38,6 @@ func (g *GUI) initBasicWidgets() {
 	g.videoOnCheck = widget.NewCheck("Video On", nil)
 	g.videoOnCheck.SetChecked(true)
 
-	g.screenOnCheck = widget.NewCheck("Turn Screen On", nil)
-	g.screenOnCheck.SetChecked(true)
-
-	g.stayAwakeCheck = widget.NewCheck("Stay Awake", nil)
-	g.stayAwakeCheck.SetChecked(false)
-
 	g.recordVideoCheck = widget.NewCheck("Record Video", nil)
 	g.videoFormatCombo = widget.NewSelect([]string{"mp4", "mkv"}, nil)
 	g.videoFormatCombo.SetSelected("mp4")
@@ -83,8 +77,6 @@ func (g *GUI) buildBasicTab() *fyne.Container {
 		bitrateRow,
 		maxSizeRow,
 		g.videoOnCheck,
-		g.screenOnCheck,
-		g.stayAwakeCheck,
 		recVideoRow,
 		recAudioRow,
 	)

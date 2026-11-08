@@ -20,6 +20,7 @@ type GUI struct {
 	devices        []domain.Device
 	selectedDevice string
 	stopWatcher    chan struct{}
+	caps           domain.ScrcpyCapabilities
 
 	// Core & List widgets
 	deviceList      *widget.List
@@ -30,12 +31,20 @@ type GUI struct {
 	bitRateSlider    *widget.Slider
 	maxSizeEntry     *widget.Entry
 	videoOnCheck     *widget.Check
-	screenOnCheck    *widget.Check
-	stayAwakeCheck   *widget.Check
 	recordVideoCheck *widget.Check
 	videoFormatCombo *widget.Select
 	recordAudioCheck *widget.Check
 	audioFormatCombo *widget.Select
+
+	// Device widgets (device.md)
+	screenOnCheck         *widget.Check
+	stayAwakeCheck        *widget.Check
+	showTouchesCheck      *widget.Check
+	powerOffOnCloseCheck  *widget.Check
+	noPowerOnCheck        *widget.Check
+	keepActiveCheck       *widget.Check
+	screenOffTimeoutEntry *widget.Entry
+	startAppEntry         *widget.Entry
 
 	// Video Engine widgets
 	videoSourceCombo  *widget.Select
@@ -78,10 +87,12 @@ type GUI struct {
 
 // NewGUI constructs the GUI and sets up the layout.
 func NewGUI(a fyne.App, w fyne.Window, svc domain.DeviceService) *GUI {
+	caps, _ := svc.GetScrcpyCapabilities()
 	g := &GUI{
 		app:         a,
 		window:      w,
 		service:     svc,
+		caps:        caps,
 		stopWatcher: make(chan struct{}),
 	}
 	g.buildUI()
@@ -92,6 +103,7 @@ func NewGUI(a fyne.App, w fyne.Window, svc domain.DeviceService) *GUI {
 
 func (g *GUI) initWidgets() {
 	g.initBasicWidgets()
+	g.initDeviceWidgets()
 	g.initVideoWidgets()
 	g.initAudioWidgets()
 	g.initControlWidgets()
@@ -100,6 +112,7 @@ func (g *GUI) initWidgets() {
 func (g *GUI) buildOptionsPanel() *fyne.Container {
 	tabs := container.NewAppTabs(
 		container.NewTabItem("Basic & Rec", g.buildBasicTab()),
+		container.NewTabItem("Device", g.buildDeviceTab()),
 		container.NewTabItem("Video", g.buildVideoEngineTab()),
 		container.NewTabItem("Audio", g.buildAudioEngineTab()),
 		container.NewTabItem("Control", g.buildControlTab()),

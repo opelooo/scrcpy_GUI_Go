@@ -156,3 +156,8 @@ func (s *ScrcpyService) DisconnectDevice(target string) error {
 	}
 	return s.client.Disconnect(target)
 }
+
+// GetScrcpyCapabilities queries the underlying client for scrcpy binary capabilities.
+func (s *ScrcpyService) GetScrcpyCapabilities() (domain.ScrcpyCapabilities, error) {
+	return s.client.GetScrcpyCapabilities()
+}

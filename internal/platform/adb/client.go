@@ -278,3 +278,43 @@ func (c *Client) ExecuteScrcpy(args []string) error {
 	}
 	return cmd.Start()
 }
+
+// GetScrcpyCapabilities queries scrcpy version and determines supported flags.
+func (c *Client) GetScrcpyCapabilities() (domain.ScrcpyCapabilities, error) {
+	if c.ScrcpyPath == "" {
+		return domain.ScrcpyCapabilities{}, errors.New("scrcpy binary not found")
+	}
+
+	cmdVer := exec.Command(c.ScrcpyPath, "--version")
+	outVer, err := cmdVer.Output()
+	if err != nil {
+		return domain.ScrcpyCapabilities{}, fmt.Errorf("failed to get scrcpy version: %w", err)
+	}
+
+	raw := strings.TrimSpace(string(outVer))
+	major, minor, patch, err := ParseScrcpyVersion(raw)
+	if err != nil {
+		return domain.ScrcpyCapabilities{VersionRaw: raw}, nil
+	}
+
+	caps := domain.ScrcpyCapabilities{
+		VersionRaw: raw,
+		Major:      major,
+		Minor:      minor,
+		Patch:      patch,
+	}
+
+	if major > 3 || (major == 3 && minor >= 4) {
+		caps.HasKeepActive = true
+		return caps, nil
+	}
+
+	cmdHelp := exec.Command(c.ScrcpyPath, "--help")
+	if outHelp, errHelp := cmdHelp.Output(); errHelp == nil {
+		if strings.Contains(string(outHelp), "--keep-active") {
+			caps.HasKeepActive = true
+		}
+	}
+
+	return caps, nil
+}

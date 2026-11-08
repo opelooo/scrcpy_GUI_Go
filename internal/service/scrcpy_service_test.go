@@ -69,6 +69,15 @@ func (m *mockADBClient) ExecuteScrcpy(args []string) error {
 	return nil
 }
 
+func (m *mockADBClient) GetScrcpyCapabilities() (domain.ScrcpyCapabilities, error) {
+	return domain.ScrcpyCapabilities{
+		VersionRaw: "scrcpy 3.3.4",
+		Major:      3,
+		Minor:      3,
+		Patch:      4,
+	}, nil
+}
+
 func TestServiceListDevices(t *testing.T) {
 	mock := &mockADBClient{
 		devices: []domain.Device{

@@ -2,8 +2,10 @@ package adb
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -243,6 +245,53 @@ func appendCameraArgs(args []string, opts domain.ScrcpyOptions) []string {
 	return args
 }
 
+func appendDeviceArgs(args []string, opts domain.ScrcpyOptions) []string {
+	if opts.ShowTouches {
+		args = append(args, "--show-touches")
+	}
+	if opts.PowerOffOnClose {
+		args = append(args, "--power-off-on-close")
+	}
+	if opts.NoPowerOn {
+		args = append(args, "--no-power-on")
+	}
+	if timeout := strings.TrimSpace(opts.ScreenOffTimeout); timeout != "" && timeout != "0" {
+		args = append(args, fmt.Sprintf("--screen-off-timeout=%s", timeout))
+	}
+	if app := strings.TrimSpace(opts.StartApp); app != "" {
+		args = append(args, fmt.Sprintf("--start-app=%s", app))
+	}
+	if opts.KeepActive {
+		args = append(args, "--keep-active")
+	}
+	return args
+}
+
+var scrcpyVersionRe = regexp.MustCompile(`scrcpy\s+v?(\d+)\.(\d+)(?:\.(\d+))?`)
+
+// ParseScrcpyVersion parses scrcpy version string from scrcpy --version output.
+func ParseScrcpyVersion(output string) (int, int, int, error) {
+	m := scrcpyVersionRe.FindStringSubmatch(output)
+	if len(m) < 3 {
+		return 0, 0, 0, errors.New("invalid scrcpy version output")
+	}
+	major, err := strconv.Atoi(m[1])
+	if err != nil {
+		return 0, 0, 0, fmt.Errorf("invalid major version: %w", err)
+	}
+	minor, err := strconv.Atoi(m[2])
+	if err != nil {
+		return 0, 0, 0, fmt.Errorf("invalid minor version: %w", err)
+	}
+	patch := 0
+	if len(m) > 3 && m[3] != "" {
+		if p, err := strconv.Atoi(m[3]); err == nil {
+			patch = p
+		}
+	}
+	return major, minor, patch, nil
+}
+
 // BuildScrcpyArgs constructs the CLI arguments for scrcpy execution.
 func BuildScrcpyArgs(opts domain.ScrcpyOptions) []string {
 	var args []string
@@ -251,6 +300,7 @@ func BuildScrcpyArgs(opts domain.ScrcpyOptions) []string {
 	args = appendCameraArgs(args, opts)
 	args = appendAudioArgs(args, opts)
 	args = appendControlArgs(args, opts)
+	args = appendDeviceArgs(args, opts)
 	args = appendRecordArgs(args, opts)
 	return args
 }

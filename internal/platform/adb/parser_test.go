@@ -445,3 +445,112 @@ func TestConflictRecordWhenMediaDisabled(t *testing.T) {
 		t.Errorf("expected --record to be omitted when both video and audio are off, got %q", joined)
 	}
 }
+
+func TestParseScrcpyVersion(t *testing.T) {
+	tests := []struct {
+		name    string
+		input   string
+		major   int
+		minor   int
+		patch   int
+		wantErr bool
+	}{
+		{
+			name:    "Standard Release 3.3.4",
+			input:   "scrcpy 3.3.4 <https://github.com/Genymobile/scrcpy>",
+			major:   3,
+			minor:   3,
+			patch:   4,
+			wantErr: false,
+		},
+		{
+			name:    "Two-segment 3.4",
+			input:   "scrcpy 3.4 <https://github.com/Genymobile/scrcpy>",
+			major:   3,
+			minor:   4,
+			patch:   0,
+			wantErr: false,
+		},
+		{
+			name:    "Prefixed v2.5.1",
+			input:   "scrcpy v2.5.1",
+			major:   2,
+			minor:   5,
+			patch:   1,
+			wantErr: false,
+		},
+		{
+			name:    "Invalid Output",
+			input:   "some random text",
+			major:   0,
+			minor:   0,
+			patch:   0,
+			wantErr: true,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			maj, min, ptch, err := ParseScrcpyVersion(tc.input)
+			if (err != nil) != tc.wantErr {
+				t.Fatalf("expected error: %v, got: %v", tc.wantErr, err)
+			}
+			if maj != tc.major || min != tc.minor || ptch != tc.patch {
+				t.Errorf("expected (%d, %d, %d), got (%d, %d, %d)", tc.major, tc.minor, tc.patch, maj, min, ptch)
+			}
+		})
+	}
+}
+
+func TestBuildScrcpyArgsDeviceFeatures(t *testing.T) {
+	opts := domain.ScrcpyOptions{
+		DeviceSerial:     "DEV_DEV",
+		ShowTouches:      true,
+		PowerOffOnClose:  true,
+		NoPowerOn:        true,
+		ScreenOffTimeout: "120",
+		StartApp:         "org.mozilla.firefox",
+		KeepActive:       true,
+	}
+
+	args := BuildScrcpyArgs(opts)
+	joined := strings.Join(args, " ")
+	expectedFlags := []string{
+		"-s DEV_DEV",
+		"--show-touches",
+		"--power-off-on-close",
+		"--no-power-on",
+		"--screen-off-timeout=120",
+		"--start-app=org.mozilla.firefox",
+		"--keep-active",
+	}
+
+	for _, flag := range expectedFlags {
+		if !strings.Contains(joined, flag) {
+			t.Errorf("expected flag %q to be in args, got %q", flag, joined)
+		}
+	}
+}
+
+func TestBuildScrcpyArgsDeviceFeaturesDefaults(t *testing.T) {
+	opts := domain.ScrcpyOptions{
+		DeviceSerial: "DEV_DEV",
+	}
+
+	args := BuildScrcpyArgs(opts)
+	joined := strings.Join(args, " ")
+	prohibitedFlags := []string{
+		"--show-touches",
+		"--power-off-on-close",
+		"--no-power-on",
+		"--screen-off-timeout",
+		"--start-app",
+		"--keep-active",
+	}
+
+	for _, flag := range prohibitedFlags {
+		if strings.Contains(joined, flag) {
+			t.Errorf("flag %q should not be present with defaults, got %q", flag, joined)
+		}
+	}
+}

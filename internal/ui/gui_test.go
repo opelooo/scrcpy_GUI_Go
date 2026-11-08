@@ -126,6 +126,12 @@ func TestGUIInitialization(t *testing.T) {
 	if gui.noControlCheck.Checked {
 		t.Errorf("expected noControlCheck to be unchecked initially")
 	}
+	if gui.otgModeCheck.Checked {
+		t.Errorf("expected otgModeCheck to be unchecked initially")
+	}
+	if gui.controlOnlyCheck.Checked {
+		t.Errorf("expected controlOnlyCheck to be unchecked initially")
+	}
 	if gui.keyboardModeCombo.Selected != "default" {
 		t.Errorf("expected default keyboard mode, got %s", gui.keyboardModeCombo.Selected)
 	}

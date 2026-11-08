@@ -167,10 +167,7 @@ func appendAudioArgs(args []string, opts domain.ScrcpyOptions) []string {
 }
 
 func appendControlArgs(args []string, opts domain.ScrcpyOptions) []string {
-	isNetwork := opts.SelectTCPIP || opts.TCPIPAddress != "" || strings.Contains(opts.DeviceSerial, ":")
-	if opts.OTGMode && !isNetwork {
-		args = append(args, "--otg")
-	} else if opts.NoControl {
+	if opts.NoControl {
 		return append(args, "--no-control")
 	}
 	if kbd := strings.TrimSpace(opts.KeyboardMode); kbd != "" && kbd != "default" && kbd != "Default" {
@@ -447,10 +444,47 @@ func appendTunnelArgs(args []string, opts domain.ScrcpyOptions) []string {
 	return args
 }
 
+// appendOTGArgs constructs argument slice strictly allowed in OTG mode.
+func appendOTGArgs(args []string, opts domain.ScrcpyOptions) []string {
+	args = append(args, "--otg")
+	if kbd := strings.TrimSpace(opts.KeyboardMode); kbd == "disabled" {
+		args = append(args, "--keyboard=disabled")
+	}
+	if mouse := strings.TrimSpace(opts.MouseMode); mouse == "disabled" {
+		args = append(args, "--mouse=disabled")
+	}
+	if gp := strings.TrimSpace(opts.GamepadMode); gp != "" && !strings.HasPrefix(strings.ToLower(gp), "default") {
+		args = append(args, fmt.Sprintf("--gamepad=%s", gp))
+	}
+	if sm := strings.TrimSpace(opts.ShortcutMod); sm != "" && !strings.HasPrefix(strings.ToLower(sm), "default") {
+		args = append(args, fmt.Sprintf("--shortcut-mod=%s", sm))
+	}
+	if title := strings.TrimSpace(opts.WindowTitle); title != "" {
+		args = append(args, fmt.Sprintf("--window-title=%s", title))
+	}
+	if opts.RawKeyEvents {
+		args = append(args, "--raw-key-events")
+	}
+	return args
+}
+
 // BuildScrcpyArgs constructs the CLI arguments for scrcpy execution.
 func BuildScrcpyArgs(opts domain.ScrcpyOptions) []string {
+	isNetwork := opts.SelectTCPIP || opts.TCPIPAddress != "" || strings.Contains(opts.DeviceSerial, ":")
+	isOTGActive := opts.OTGMode && !isNetwork
+
 	var args []string
 	args = appendConnectionArgs(args, opts)
+
+	if isOTGActive {
+		return appendOTGArgs(args, opts)
+	}
+
+	if opts.ControlOnly {
+		opts.VideoOn = false
+		opts.AudioOn = false
+	}
+
 	args = appendTunnelArgs(args, opts)
 	args = appendVideoArgs(args, opts)
 	args = appendCameraArgs(args, opts)

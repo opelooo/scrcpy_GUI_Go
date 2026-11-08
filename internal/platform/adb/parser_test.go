@@ -191,7 +191,6 @@ func TestBuildScrcpyArgsControlFeatures(t *testing.T) {
 		RawKeyEvents:        true,
 		NoKeyRepeat:         true,
 		ShortcutMod:         "lctrl+lalt",
-		OTGMode:             true,
 	}
 
 	args := BuildScrcpyArgs(opts)
@@ -206,7 +205,6 @@ func TestBuildScrcpyArgsControlFeatures(t *testing.T) {
 		"--raw-key-events",
 		"--no-key-repeat",
 		"--shortcut-mod=lctrl+lalt",
-		"--otg",
 	}
 
 	joined := strings.Join(args, " ")
@@ -909,5 +907,125 @@ func TestBuildScrcpyArgsPortRange(t *testing.T) {
 
 	if !strings.Contains(joined, "--port=27183:27199") {
 		t.Errorf("expected --port=27183:27199 in args, got %q", joined)
+	}
+}
+
+func TestBuildScrcpyArgsOTGModeCleanIsolation(t *testing.T) {
+	opts := domain.ScrcpyOptions{
+		DeviceSerial:     "DEV_OTG",
+		OTGMode:          true,
+		VideoOn:          true,
+		AudioOn:          true,
+		MaxSize:          "1024",
+		BitRate:          "8M",
+		StayAwake:        true,
+		ScreenOn:         false,
+		RecordVideo:      true,
+		V4L2Sink:         "/dev/video0",
+		ShowTouches:      true,
+		PowerOffOnClose:  true,
+		ScreenOffTimeout: "120",
+		NewDisplay:       true,
+		AlwaysOnTop:      true,
+		KeyboardMode:     "disabled",
+		MouseMode:        "disabled",
+		GamepadMode:      "aoa",
+		WindowTitle:      "OTG Mirror",
+	}
+
+	args := BuildScrcpyArgs(opts)
+	joined := strings.Join(args, " ")
+
+	expected := []string{
+		"-s DEV_OTG",
+		"--otg",
+		"--keyboard=disabled",
+		"--mouse=disabled",
+		"--gamepad=aoa",
+		"--window-title=OTG Mirror",
+	}
+	for _, flag := range expected {
+		if !strings.Contains(joined, flag) {
+			t.Errorf("expected %q in OTG args, got %q", flag, joined)
+		}
+	}
+
+	prohibited := []string{
+		"-m ",
+		"-b ",
+		"--no-video",
+		"--no-audio",
+		"--stay-awake",
+		"--turn-screen-off",
+		"--record",
+		"--v4l2-sink",
+		"--show-touches",
+		"--power-off-on-close",
+		"--screen-off-timeout",
+		"--new-display",
+		"--always-on-top",
+	}
+	for _, flag := range prohibited {
+		if strings.Contains(joined, flag) {
+			t.Errorf("prohibited flag %q present in OTG mode, got %q", flag, joined)
+		}
+	}
+}
+
+func TestBuildScrcpyArgsOTGWithGamepadAOA(t *testing.T) {
+	opts := domain.ScrcpyOptions{
+		DeviceSerial: "DEV_OTG",
+		OTGMode:      true,
+		GamepadMode:  "aoa",
+	}
+
+	args := BuildScrcpyArgs(opts)
+	joined := strings.Join(args, " ")
+
+	if !strings.Contains(joined, "--otg") || !strings.Contains(joined, "--gamepad=aoa") {
+		t.Errorf("expected --otg and --gamepad=aoa, got %q", joined)
+	}
+}
+
+func TestBuildScrcpyArgsControlOnlyMode(t *testing.T) {
+	opts := domain.ScrcpyOptions{
+		DeviceSerial: "DEV_CTRL",
+		ControlOnly:  true,
+		VideoOn:      true,
+		AudioOn:      true,
+		KeyboardMode: "uhid",
+		MouseMode:    "uhid",
+	}
+
+	args := BuildScrcpyArgs(opts)
+	joined := strings.Join(args, " ")
+
+	if !strings.Contains(joined, "--no-video") {
+		t.Errorf("expected --no-video in ControlOnly mode, got %q", joined)
+	}
+	if !strings.Contains(joined, "--no-audio") {
+		t.Errorf("expected --no-audio in ControlOnly mode, got %q", joined)
+	}
+	if !strings.Contains(joined, "--keyboard=uhid") {
+		t.Errorf("expected --keyboard=uhid, got %q", joined)
+	}
+}
+
+func TestConflictOTGSuppressesDeviceShellCommands(t *testing.T) {
+	opts := domain.ScrcpyOptions{
+		DeviceSerial:    "DEV_OTG",
+		OTGMode:         true,
+		ShowTouches:     true,
+		PowerOffOnClose: true,
+	}
+
+	args := BuildScrcpyArgs(opts)
+	joined := strings.Join(args, " ")
+
+	if strings.Contains(joined, "--show-touches") {
+		t.Errorf("expected --show-touches to be suppressed in OTG mode, got %q", joined)
+	}
+	if strings.Contains(joined, "--power-off-on-close") {
+		t.Errorf("expected --power-off-on-close to be suppressed in OTG mode, got %q", joined)
 	}
 }

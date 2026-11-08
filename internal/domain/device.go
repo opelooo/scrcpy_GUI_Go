@@ -79,6 +79,7 @@ type ScrcpyOptions struct {
 	NoKeyRepeat          bool
 	ShortcutMod          string
 	OTGMode              bool
+	ControlOnly          bool
 	GamepadMode          string
 	ShowTouches          bool
 	PowerOffOnClose      bool

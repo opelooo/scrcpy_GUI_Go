@@ -86,6 +86,7 @@ type GUI struct {
 	noKeyRepeatCheck         *widget.Check
 	shortcutModCombo         *widget.Select
 	otgModeCheck             *widget.Check
+	controlOnlyCheck         *widget.Check
 
 	// Window Engine widgets (window.md)
 	alwaysOnTopCheck             *widget.Check

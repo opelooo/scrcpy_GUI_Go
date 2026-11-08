@@ -6,21 +6,7 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-func (g *GUI) initControlWidgets() {
-	g.noControlCheck = widget.NewCheck("Read-Only (Disable Control)", func(checked bool) {
-		if checked && g.otgModeCheck != nil && g.otgModeCheck.Checked {
-			g.otgModeCheck.SetChecked(false)
-		}
-	})
-	g.noControlCheck.SetChecked(false)
-
-	g.otgModeCheck = widget.NewCheck("OTG Mode (Hardware KBM via USB)", func(checked bool) {
-		if checked && g.noControlCheck != nil && g.noControlCheck.Checked {
-			g.noControlCheck.SetChecked(false)
-		}
-	})
-	g.otgModeCheck.SetChecked(false)
-
+func (g *GUI) initControlCombos() {
 	g.keyboardModeCombo = widget.NewSelect([]string{"default", "uhid", "aoa", "disabled"}, nil)
 	g.keyboardModeCombo.SetSelected("default")
 
@@ -35,7 +21,50 @@ func (g *GUI) initControlWidgets() {
 
 	g.pushTargetEntry = widget.NewEntry()
 	g.pushTargetEntry.SetText("/sdcard/Download/")
+}
 
+func (g *GUI) initControlModes() {
+	g.noControlCheck = widget.NewCheck("Read-Only (Disable Control)", func(checked bool) {
+		if !checked {
+			return
+		}
+		if g.otgModeCheck != nil && g.otgModeCheck.Checked {
+			g.otgModeCheck.SetChecked(false)
+		}
+		if g.controlOnlyCheck != nil && g.controlOnlyCheck.Checked {
+			g.controlOnlyCheck.SetChecked(false)
+		}
+	})
+	g.noControlCheck.SetChecked(false)
+
+	g.otgModeCheck = widget.NewCheck("OTG Mode (Hardware KBM via USB)", func(checked bool) {
+		if !checked {
+			return
+		}
+		if g.noControlCheck != nil && g.noControlCheck.Checked {
+			g.noControlCheck.SetChecked(false)
+		}
+		if g.controlOnlyCheck != nil && g.controlOnlyCheck.Checked {
+			g.controlOnlyCheck.SetChecked(false)
+		}
+	})
+	g.otgModeCheck.SetChecked(false)
+
+	g.controlOnlyCheck = widget.NewCheck("Control Only (No Video/Audio, Wireless UHID)", func(checked bool) {
+		if !checked {
+			return
+		}
+		if g.noControlCheck != nil && g.noControlCheck.Checked {
+			g.noControlCheck.SetChecked(false)
+		}
+		if g.otgModeCheck != nil && g.otgModeCheck.Checked {
+			g.otgModeCheck.SetChecked(false)
+		}
+	})
+	g.controlOnlyCheck.SetChecked(false)
+}
+
+func (g *GUI) initControlModifiers() {
 	g.preferTextCheck = widget.NewCheck("Prefer Text Injection (Accents/Symbols)", func(checked bool) {
 		if checked && g.rawKeyEventsCheck != nil && g.rawKeyEventsCheck.Checked {
 			g.rawKeyEventsCheck.SetChecked(false)
@@ -61,6 +90,12 @@ func (g *GUI) initControlWidgets() {
 
 	g.legacyPasteCheck = widget.NewCheck("Legacy Paste (Inject Keys)", nil)
 	g.legacyPasteCheck.SetChecked(false)
+}
+
+func (g *GUI) initControlWidgets() {
+	g.initControlCombos()
+	g.initControlModes()
+	g.initControlModifiers()
 }
 
 func (g *GUI) buildControlModeRows() []fyne.CanvasObject {
@@ -101,6 +136,7 @@ func (g *GUI) buildControlCheckboxes() []fyne.CanvasObject {
 	return []fyne.CanvasObject{
 		g.noControlCheck,
 		g.otgModeCheck,
+		g.controlOnlyCheck,
 		g.preferTextCheck,
 		g.rawKeyEventsCheck,
 		g.noKeyRepeatCheck,

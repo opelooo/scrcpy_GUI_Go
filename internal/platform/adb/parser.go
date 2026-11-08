@@ -199,11 +199,30 @@ func appendRecordArgs(args []string, opts domain.ScrcpyOptions) []string {
 	return args
 }
 
+func appendCameraArgs(args []string, opts domain.ScrcpyOptions) []string {
+	src := strings.TrimSpace(opts.VideoSource)
+	if src != "camera" {
+		return args
+	}
+	args = append(args, "--video-source=camera")
+	if facing := strings.TrimSpace(opts.CameraFacing); facing != "" && facing != "default" && facing != "Default" {
+		args = append(args, fmt.Sprintf("--camera-facing=%s", facing))
+	}
+	if size := strings.TrimSpace(opts.CameraSize); size != "" {
+		args = append(args, fmt.Sprintf("--camera-size=%s", size))
+	}
+	if fps := strings.TrimSpace(opts.CameraFPS); fps != "" && fps != "default" && fps != "Default" {
+		args = append(args, fmt.Sprintf("--camera-fps=%s", fps))
+	}
+	return args
+}
+
 // BuildScrcpyArgs constructs the CLI arguments for scrcpy execution.
 func BuildScrcpyArgs(opts domain.ScrcpyOptions) []string {
 	var args []string
 	args = appendConnectionArgs(args, opts)
 	args = appendVideoArgs(args, opts)
+	args = appendCameraArgs(args, opts)
 	args = appendAudioArgs(args, opts)
 	args = appendControlArgs(args, opts)
 	args = appendRecordArgs(args, opts)

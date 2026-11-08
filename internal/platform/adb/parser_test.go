@@ -252,3 +252,41 @@ func TestBuildScrcpyArgsV4L2Empty(t *testing.T) {
 		t.Errorf("expected args not to contain v4l2 flags, got %q", joined)
 	}
 }
+
+func TestBuildScrcpyArgsCameraSource(t *testing.T) {
+	opts := domain.ScrcpyOptions{
+		DeviceSerial: "DEV_CAM",
+		VideoSource:  "camera",
+		CameraFacing: "front",
+		CameraSize:   "1920x1080",
+		CameraFPS:    "60",
+	}
+
+	args := BuildScrcpyArgs(opts)
+	joined := strings.Join(args, " ")
+	expected := []string{
+		"--video-source=camera",
+		"--camera-facing=front",
+		"--camera-size=1920x1080",
+		"--camera-fps=60",
+	}
+	for _, sub := range expected {
+		if !strings.Contains(joined, sub) {
+			t.Errorf("expected args to contain %q, but got %q", sub, joined)
+		}
+	}
+}
+
+func TestBuildScrcpyArgsCameraDisabled(t *testing.T) {
+	opts := domain.ScrcpyOptions{
+		DeviceSerial: "DEV_CAM",
+		VideoSource:  "display",
+		CameraFacing: "front",
+	}
+
+	args := BuildScrcpyArgs(opts)
+	joined := strings.Join(args, " ")
+	if strings.Contains(joined, "--video-source=camera") || strings.Contains(joined, "--camera-facing") {
+		t.Errorf("expected camera flags to be omitted when VideoSource is display, got %q", joined)
+	}
+}

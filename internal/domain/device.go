@@ -66,6 +66,10 @@ type ScrcpyOptions struct {
 	PushTarget           string
 	V4L2Sink             string
 	V4L2Buffer           string
+	VideoSource          string
+	CameraFacing         string
+	CameraSize           string
+	CameraFPS            string
 }
 
 // ADBClient defines the low-level ADB/scrcpy integration interface.

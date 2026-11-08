@@ -1,9 +1,32 @@
 package domain
 
+// ConnectionType represents the device transport method.
+type ConnectionType string
+
+const (
+	ConnUSB   ConnectionType = "USB"
+	ConnTCPIP ConnectionType = "TCP/IP"
+)
+
 // Device represents an attached Android device.
 type Device struct {
-	Serial string
-	State  string
+	Serial         string
+	State          string
+	ConnectionType ConnectionType
+}
+
+// ConnectOptions defines parameters for direct TCP/IP connection.
+type ConnectOptions struct {
+	IP             string
+	Port           int
+	ForceReconnect bool
+}
+
+// PairOptions defines parameters for Android 11+ wireless pairing.
+type PairOptions struct {
+	IP   string
+	Port int
+	Code string
 }
 
 // ScrcpyOptions defines user parameters to launch scrcpy.
@@ -18,6 +41,9 @@ type ScrcpyOptions struct {
 	VideoFormat  string
 	RecordAudio  bool
 	AudioFormat  string
+	SelectUSB    bool
+	SelectTCPIP  bool
+	TCPIPAddress string
 }
 
 // ADBClient defines the low-level ADB/scrcpy integration interface.
@@ -28,6 +54,8 @@ type ADBClient interface {
 	GetIP(serial string) (string, error)
 	ConfigureTCPIP(serial string, port int) error
 	Connect(target string) error
+	Disconnect(target string) error
+	Pair(ip string, port int, code string) error
 	ExecuteScrcpy(args []string) error
 }
 
@@ -37,5 +65,8 @@ type DeviceService interface {
 	GetDeviceInfo(serial string) (string, error)
 	GetDeviceIP(serial string) (string, error)
 	ConnectTCPIP(serial string) error
+	DirectConnect(opts ConnectOptions) error
+	PairDevice(opts PairOptions) error
+	DisconnectDevice(target string) error
 	LaunchScrcpy(opts ScrcpyOptions) error
 }

@@ -100,10 +100,59 @@ func (s *ScrcpyService) ConnectTCPIP(serial string) error {
 
 // LaunchScrcpy builds arguments and executes scrcpy asynchronously.
 func (s *ScrcpyService) LaunchScrcpy(opts domain.ScrcpyOptions) error {
-	if opts.DeviceSerial == "" {
+	if opts.DeviceSerial == "" && !opts.SelectUSB && !opts.SelectTCPIP && opts.TCPIPAddress == "" {
 		return errors.New("please select device")
 	}
 
 	args := adb.BuildScrcpyArgs(opts)
 	return s.client.ExecuteScrcpy(args)
+}
+
+// DirectConnect connects to an arbitrary IP:port over wireless ADB and launches scrcpy.
+func (s *ScrcpyService) DirectConnect(opts domain.ConnectOptions) error {
+	if opts.IP == "" {
+		return errors.New("IP address required")
+	}
+	port := opts.Port
+	if port <= 0 {
+		port = 5555
+	}
+	target := fmt.Sprintf("%s:%d", opts.IP, port)
+
+	if err := s.client.Connect(target); err != nil {
+		return fmt.Errorf("connect to %s: %w", target, err)
+	}
+
+	tcpipArg := target
+	if opts.ForceReconnect {
+		tcpipArg = "+" + target
+	}
+
+	err := s.client.ExecuteScrcpy([]string{fmt.Sprintf("--tcpip=%s", tcpipArg)})
+	if err != nil {
+		return s.client.ExecuteScrcpy([]string{"-s", target})
+	}
+	return nil
+}
+
+// PairDevice pairs an Android 11+ device using its IP, pairing port, and 6-digit code.
+func (s *ScrcpyService) PairDevice(opts domain.PairOptions) error {
+	if opts.IP == "" {
+		return errors.New("IP address required")
+	}
+	if opts.Port <= 0 {
+		return errors.New("valid pairing port required")
+	}
+	if opts.Code == "" {
+		return errors.New("pairing code required")
+	}
+	return s.client.Pair(opts.IP, opts.Port, opts.Code)
+}
+
+// DisconnectDevice disconnects a wireless device target.
+func (s *ScrcpyService) DisconnectDevice(target string) error {
+	if target == "" {
+		return errors.New("device target required")
+	}
+	return s.client.Disconnect(target)
 }

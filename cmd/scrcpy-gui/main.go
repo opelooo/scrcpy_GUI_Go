@@ -48,7 +48,7 @@ func main() {
 		w.SetIcon(appIcon)
 	}
 
-	w.Resize(fyne.NewSize(670, 360))
+	w.Resize(fyne.NewSize(700, 390))
 	w.SetFixedSize(true)
 
 	// Dependency wiring

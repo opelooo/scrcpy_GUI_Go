@@ -153,6 +153,25 @@ func (c *Client) Connect(target string) error {
 	return nil
 }
 
+// Disconnect disconnects a device over network target (e.g. 192.168.1.50:5555).
+func (c *Client) Disconnect(target string) error {
+	cmd := exec.Command(c.ADBPath, "disconnect", target)
+	if out, err := cmd.CombinedOutput(); err != nil {
+		return fmt.Errorf("adb disconnect failed: %s: %w", string(out), err)
+	}
+	return nil
+}
+
+// Pair pairs a device using Android 11+ wireless pairing code.
+func (c *Client) Pair(ip string, port int, code string) error {
+	target := fmt.Sprintf("%s:%d", ip, port)
+	cmd := exec.Command(c.ADBPath, "pair", target, code)
+	if out, err := cmd.CombinedOutput(); err != nil {
+		return fmt.Errorf("adb pair failed: %s: %w", string(out), err)
+	}
+	return nil
+}
+
 // ExecuteScrcpy executes scrcpy asynchronously with the given arguments.
 func (c *Client) ExecuteScrcpy(args []string) error {
 	cmd := exec.Command(c.ScrcpyPath, args...)

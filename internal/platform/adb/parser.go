@@ -10,7 +10,12 @@ import (
 	"github.com/opelooo/scrcpy_GUI_Go/internal/domain"
 )
 
-// ParseDevices parses the raw stdout of 'adb devices' into domain.Device slice.
+// IsTCPIPDevice checks whether the serial represents a network TCP/IP endpoint (e.g. 192.168.1.5:5555).
+func IsTCPIPDevice(serial string) bool {
+	return strings.Contains(serial, ":")
+}
+
+// ParseDevices parses the raw stdout of 'adb devices' into domain.Device slice with transport type.
 func ParseDevices(output string) []domain.Device {
 	var devices []domain.Device
 	scanner := bufio.NewScanner(strings.NewReader(output))
@@ -22,15 +27,22 @@ func ParseDevices(output string) []domain.Device {
 			continue
 		}
 		fields := strings.Fields(line)
+		connType := domain.ConnUSB
+		if IsTCPIPDevice(fields[0]) {
+			connType = domain.ConnTCPIP
+		}
+
 		if len(fields) >= 2 {
 			devices = append(devices, domain.Device{
-				Serial: fields[0],
-				State:  fields[1],
+				Serial:         fields[0],
+				State:          fields[1],
+				ConnectionType: connType,
 			})
 		} else if len(fields) == 1 {
 			devices = append(devices, domain.Device{
-				Serial: fields[0],
-				State:  "device",
+				Serial:         fields[0],
+				State:          "device",
+				ConnectionType: connType,
 			})
 		}
 	}
@@ -63,9 +75,16 @@ func ParseDeviceIP(output string) string {
 // BuildScrcpyArgs constructs the CLI arguments for scrcpy execution.
 func BuildScrcpyArgs(opts domain.ScrcpyOptions) []string {
 	var args []string
-	if opts.DeviceSerial != "" {
+	if opts.TCPIPAddress != "" {
+		args = append(args, fmt.Sprintf("--tcpip=%s", opts.TCPIPAddress))
+	} else if opts.SelectUSB {
+		args = append(args, "-d")
+	} else if opts.SelectTCPIP {
+		args = append(args, "-e")
+	} else if opts.DeviceSerial != "" {
 		args = append(args, "-s", opts.DeviceSerial)
 	}
+
 	if strings.TrimSpace(opts.MaxSize) != "" {
 		args = append(args, "-m", strings.TrimSpace(opts.MaxSize))
 	}

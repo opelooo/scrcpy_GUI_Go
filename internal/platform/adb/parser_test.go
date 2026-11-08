@@ -14,16 +14,18 @@ func TestParseDevices(t *testing.T) {
 List of devices attached
 RF8M12345XYZ	device
 emulator-5554	device
+192.168.1.105:5555	device
 offline_dev	offline
 unauth_dev	unauthorized
 
 `
 	got := ParseDevices(rawOutput)
 	want := []domain.Device{
-		{Serial: "RF8M12345XYZ", State: "device"},
-		{Serial: "emulator-5554", State: "device"},
-		{Serial: "offline_dev", State: "offline"},
-		{Serial: "unauth_dev", State: "unauthorized"},
+		{Serial: "RF8M12345XYZ", State: "device", ConnectionType: domain.ConnUSB},
+		{Serial: "emulator-5554", State: "device", ConnectionType: domain.ConnUSB},
+		{Serial: "192.168.1.105:5555", State: "device", ConnectionType: domain.ConnTCPIP},
+		{Serial: "offline_dev", State: "offline", ConnectionType: domain.ConnUSB},
+		{Serial: "unauth_dev", State: "unauthorized", ConnectionType: domain.ConnUSB},
 	}
 
 	if !reflect.DeepEqual(got, want) {
@@ -68,5 +70,34 @@ func TestBuildScrcpyArgs(t *testing.T) {
 		if !strings.Contains(joined, sub) {
 			t.Errorf("expected args to contain %q, but got %q", sub, joined)
 		}
+	}
+}
+
+func TestBuildScrcpyArgsConnectionSelectors(t *testing.T) {
+	// 1. TCPIP address
+	tcpOpts := domain.ScrcpyOptions{
+		TCPIPAddress: "192.168.1.55:5555",
+	}
+	tcpArgs := strings.Join(BuildScrcpyArgs(tcpOpts), " ")
+	if !strings.Contains(tcpArgs, "--tcpip=192.168.1.55:5555") {
+		t.Errorf("expected --tcpip flag, got %s", tcpArgs)
+	}
+
+	// 2. Select USB
+	usbOpts := domain.ScrcpyOptions{
+		SelectUSB: true,
+	}
+	usbArgs := strings.Join(BuildScrcpyArgs(usbOpts), " ")
+	if !strings.Contains(usbArgs, "-d") {
+		t.Errorf("expected -d flag, got %s", usbArgs)
+	}
+
+	// 3. Select TCPIP
+	tcpipOpts := domain.ScrcpyOptions{
+		SelectTCPIP: true,
+	}
+	tcpipArgs := strings.Join(BuildScrcpyArgs(tcpipOpts), " ")
+	if !strings.Contains(tcpipArgs, "-e") {
+		t.Errorf("expected -e flag, got %s", tcpipArgs)
 	}
 }

@@ -20,7 +20,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version-file: 'go.mod'
+          go-version: '1.26.1'
           check-latest: true
 
       - name: Install Linux Build Dependencies
@@ -28,9 +28,13 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
             build-essential \
+            gcc \
             pkg-config \
             libgl1-mesa-dev \
+            libegl1-mesa-dev \
             libwayland-dev \
+            libxkbcommon-dev \
+            libxkbcommon-x11-dev \
             libx11-dev \
             libxcursor-dev \
             libxrandr-dev \
@@ -43,7 +47,7 @@ jobs:
       - name: Build Linux Binary
         run: |
           mkdir -p dist
-          CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o dist/scrcpy-gui-linux-amd64 ./cmd/scrcpy-gui
+          CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -v -ldflags="-s -w" -o dist/scrcpy-gui-linux-amd64 ./cmd/scrcpy-gui
 
       - name: Set up Zig for Windows Cross-Compilation
         uses: mlugg/setup-zig@v1
@@ -52,7 +56,7 @@ jobs:
 
       - name: Build Windows Binary
         run: |
-          CGO_ENABLED=1 GOOS=windows GOARCH=amd64 CC="zig cc -target x86_64-windows-gnu" CXX="zig c++ -target x86_64-windows-gnu" go build -ldflags="-s -w -H windowsgui" -o dist/scrcpy-gui-windows-amd64.exe ./cmd/scrcpy-gui
+          CGO_ENABLED=1 GOOS=windows GOARCH=amd64 CC="zig cc -target x86_64-windows-gnu" CXX="zig c++ -target x86_64-windows-gnu" go build -v -ldflags="-s -w -H windowsgui" -o dist/scrcpy-gui-windows-amd64.exe ./cmd/scrcpy-gui
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2

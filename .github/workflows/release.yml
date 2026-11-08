@@ -23,6 +23,16 @@ jobs:
           go-version: '1.26.1'
           check-latest: true
 
+      - name: Cache Build Artifacts
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/.cache/zig
+          key: ${{ runner.os }}-build-cache-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-build-cache-
+
       - name: Install Linux Build Dependencies
         run: |
           sudo apt-get update
@@ -47,7 +57,7 @@ jobs:
       - name: Build Linux Binary
         run: |
           mkdir -p dist
-          CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -v -ldflags="-s -w" -o dist/scrcpy-gui-linux-amd64 ./cmd/scrcpy-gui
+          CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o dist/scrcpy-gui-linux-amd64 ./cmd/scrcpy-gui
 
       - name: Set up Zig for Windows Cross-Compilation
         uses: mlugg/setup-zig@v1
@@ -56,7 +66,7 @@ jobs:
 
       - name: Build Windows Binary
         run: |
-          CGO_ENABLED=1 GOOS=windows GOARCH=amd64 CC="zig cc -target x86_64-windows-gnu" CXX="zig c++ -target x86_64-windows-gnu" go build -v -ldflags="-s -w -H windowsgui" -o dist/scrcpy-gui-windows-amd64.exe ./cmd/scrcpy-gui
+          CGO_ENABLED=1 GOOS=windows GOARCH=amd64 CC="zig cc -target x86_64-windows-gnu" CXX="zig c++ -target x86_64-windows-gnu" go build -ldflags="-s -w -H windowsgui" -o dist/scrcpy-gui-windows-amd64.exe ./cmd/scrcpy-gui
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2

@@ -24,7 +24,7 @@ var iconData []byte
 
 const (
 	appName    = "Minimal GUI Scrcpy"
-	appVersion = "v1.0.0"
+	appVersion = "v1.1.0"
 	appID      = "com.opelooo.scrcpygui"
 )
 

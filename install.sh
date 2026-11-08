@@ -8,7 +8,7 @@ set -eo pipefail
 APP_NAME="Scrcpy GUI"
 BINARY_NAME="scrcpy-gui"
 APP_DIR_NAME="scrcpy-gui"
-VERSION="1.0.0"
+VERSION="1.1.0"
 
 BOLD="\033[1m"
 GREEN="\033[0;32m"

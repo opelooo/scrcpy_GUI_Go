@@ -43,6 +43,8 @@ type GUI struct {
 	orientationCombo *widget.Select
 	videoBufferEntry *widget.Entry
 	cropEntry        *widget.Entry
+	v4l2SinkEntry    *widget.Entry
+	v4l2BufferEntry  *widget.Entry
 	noPlaybackCheck  *widget.Check
 
 	// Audio Engine widgets
@@ -113,9 +115,9 @@ func (g *GUI) buildUI() {
 	content := container.NewBorder(
 		nil, nil, nil, nil,
 		container.NewHBox(
-			container.NewGridWrap(fyne.NewSize(230, 360), leftPanel),
-			container.NewGridWrap(fyne.NewSize(125, 360), buttonPanel),
-			container.NewGridWrap(fyne.NewSize(480, 360), optionsPanel),
+			container.NewGridWrap(fyne.NewSize(230, 390), leftPanel),
+			container.NewGridWrap(fyne.NewSize(125, 390), buttonPanel),
+			container.NewGridWrap(fyne.NewSize(480, 390), optionsPanel),
 		),
 	)
 

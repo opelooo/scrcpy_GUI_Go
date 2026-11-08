@@ -22,6 +22,12 @@ func (g *GUI) initVideoWidgets() {
 	g.cropEntry = widget.NewEntry()
 	g.cropEntry.SetPlaceHolder("width:height:x:y")
 
+	g.v4l2SinkEntry = widget.NewEntry()
+	g.v4l2SinkEntry.SetPlaceHolder("e.g. /dev/video0")
+
+	g.v4l2BufferEntry = widget.NewEntry()
+	g.v4l2BufferEntry.SetPlaceHolder("e.g. 50ms")
+
 	g.noPlaybackCheck = widget.NewCheck("No Video Playback (Record Only)", nil)
 	g.noPlaybackCheck.SetChecked(false)
 }
@@ -57,6 +63,18 @@ func (g *GUI) buildVideoEngineTab() *fyne.Container {
 		container.NewGridWrap(fyne.NewSize(180, 36), g.cropEntry),
 		nil,
 	)
+	v4l2SinkRow := container.NewBorder(
+		nil, nil,
+		widget.NewLabel("v4l2 sink:"),
+		container.NewGridWrap(fyne.NewSize(180, 36), g.v4l2SinkEntry),
+		nil,
+	)
+	v4l2BufRow := container.NewBorder(
+		nil, nil,
+		widget.NewLabel("v4l2 buffer:"),
+		container.NewGridWrap(fyne.NewSize(180, 36), g.v4l2BufferEntry),
+		nil,
+	)
 
 	return container.NewVBox(
 		codecRow,
@@ -64,6 +82,8 @@ func (g *GUI) buildVideoEngineTab() *fyne.Container {
 		orientRow,
 		bufRow,
 		cropRow,
+		v4l2SinkRow,
+		v4l2BufRow,
 		g.noPlaybackCheck,
 	)
 }

@@ -61,6 +61,8 @@ func (g *GUI) collectScrcpyOptions() domain.ScrcpyOptions {
 		Orientation:     g.orientationCombo.Selected,
 		VideoBuffer:     g.videoBufferEntry.Text,
 		Crop:            g.cropEntry.Text,
+		V4L2Sink:        g.v4l2SinkEntry.Text,
+		V4L2Buffer:      g.v4l2BufferEntry.Text,
 		NoPlayback:      g.noPlaybackCheck.Checked,
 		AudioOn:         g.audioOnCheck.Checked,
 		AudioSource:     g.audioSourceCombo.Selected,

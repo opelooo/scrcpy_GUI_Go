@@ -23,7 +23,7 @@ func (g *GUI) initTunnelWidgets() {
 	g.portRangeEntry.SetPlaceHolder("e.g. 27183 or 27183:27199")
 }
 
-func (g *GUI) buildTunnelTab() *fyne.Container {
+func (g *GUI) buildTunnelRows() []fyne.CanvasObject {
 	adbServerRow := container.NewBorder(
 		nil, nil,
 		widget.NewLabel("Remote ADB Server:"),
@@ -52,7 +52,7 @@ func (g *GUI) buildTunnelTab() *fyne.Container {
 		g.portRangeEntry,
 	)
 
-	return container.NewVBox(
+	return []fyne.CanvasObject{
 		adbServerRow,
 		widget.NewSeparator(),
 		tunnelHostRow,
@@ -60,5 +60,18 @@ func (g *GUI) buildTunnelTab() *fyne.Container {
 		g.forceAdbForwardCheck,
 		widget.NewSeparator(),
 		portRangeRow,
-	)
+	}
+}
+
+func (g *GUI) buildDeviceAndNetworkTab() fyne.CanvasObject {
+	deviceHeader := widget.NewLabelWithStyle("Device Power & Display State", fyne.TextAlignLeading, fyne.TextStyle{Bold: true})
+	networkHeader := widget.NewLabelWithStyle("Network & ADB Tunnels", fyne.TextAlignLeading, fyne.TextStyle{Bold: true})
+
+	items := make([]fyne.CanvasObject, 0, 20)
+	items = append(items, deviceHeader)
+	items = append(items, g.buildDeviceRows()...)
+	items = append(items, widget.NewSeparator(), networkHeader)
+	items = append(items, g.buildTunnelRows()...)
+
+	return container.NewVScroll(container.NewVBox(items...))
 }

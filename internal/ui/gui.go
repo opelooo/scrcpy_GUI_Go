@@ -152,14 +152,10 @@ func (g *GUI) initWidgets() {
 
 func (g *GUI) buildOptionsPanel() *fyne.Container {
 	tabs := container.NewAppTabs(
-		container.NewTabItem("Basic & Rec", g.buildBasicTab()),
-		container.NewTabItem("Device", g.buildDeviceTab()),
-		container.NewTabItem("Window", g.buildWindowTab()),
-		container.NewTabItem("Display", g.buildDisplayTab()),
-		container.NewTabItem("Tunnel", g.buildTunnelTab()),
-		container.NewTabItem("Video", g.buildVideoEngineTab()),
-		container.NewTabItem("Audio", g.buildAudioEngineTab()),
+		container.NewTabItem("Media & Record", g.buildMediaTab()),
+		container.NewTabItem("Display & Window", g.buildDisplayAndWindowTab()),
 		container.NewTabItem("Control", g.buildControlTab()),
+		container.NewTabItem("Device & Network", g.buildDeviceAndNetworkTab()),
 	)
 	return container.NewBorder(
 		container.NewVBox(g.currDeviceLabel, widget.NewSeparator()),

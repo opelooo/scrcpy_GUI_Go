@@ -35,7 +35,7 @@ func (g *GUI) initDeviceWidgets() {
 	g.startAppEntry.SetPlaceHolder("e.g. org.mozilla.firefox or +pkg")
 }
 
-func (g *GUI) buildDeviceTab() *fyne.Container {
+func (g *GUI) buildDeviceRows() []fyne.CanvasObject {
 	timeoutRow := container.NewBorder(
 		nil, nil,
 		widget.NewLabel("Screen Off Timeout:"),
@@ -50,7 +50,7 @@ func (g *GUI) buildDeviceTab() *fyne.Container {
 		g.startAppEntry,
 	)
 
-	return container.NewVBox(
+	return []fyne.CanvasObject{
 		g.screenOnCheck,
 		g.stayAwakeCheck,
 		g.showTouchesCheck,
@@ -59,6 +59,6 @@ func (g *GUI) buildDeviceTab() *fyne.Container {
 		g.keepActiveCheck,
 		timeoutRow,
 		startAppRow,
-	)
+	}
 }
 

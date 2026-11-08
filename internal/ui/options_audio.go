@@ -29,7 +29,7 @@ func (g *GUI) initAudioWidgets() {
 	g.noAudioPlaybackCheck.SetChecked(false)
 }
 
-func (g *GUI) buildAudioEngineTab() *fyne.Container {
+func (g *GUI) buildAudioEngineRows() []fyne.CanvasObject {
 	sourceRow := container.NewBorder(
 		nil, nil,
 		widget.NewLabel("audio source:"),
@@ -55,7 +55,7 @@ func (g *GUI) buildAudioEngineTab() *fyne.Container {
 		nil,
 	)
 
-	return container.NewVBox(
+	return []fyne.CanvasObject{
 		g.audioOnCheck,
 		sourceRow,
 		codecRow,
@@ -63,6 +63,6 @@ func (g *GUI) buildAudioEngineTab() *fyne.Container {
 		bufRow,
 		g.audioDupCheck,
 		g.noAudioPlaybackCheck,
-	)
+	}
 }
 

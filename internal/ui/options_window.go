@@ -61,7 +61,7 @@ func (g *GUI) initWindowAdvancedWidgets() {
 	}
 }
 
-func (g *GUI) buildWindowTab() *fyne.Container {
+func (g *GUI) buildWindowRows() []fyne.CanvasObject {
 	titleRow := container.NewBorder(
 		nil, nil,
 		widget.NewLabel("Window Title:"),
@@ -83,7 +83,7 @@ func (g *GUI) buildWindowTab() *fyne.Container {
 		container.NewGridWithColumns(2, g.windowWidthEntry, g.windowHeightEntry),
 	)
 
-	return container.NewVBox(
+	return []fyne.CanvasObject{
 		g.alwaysOnTopCheck,
 		g.fullscreenCheck,
 		g.windowBorderlessCheck,
@@ -95,5 +95,5 @@ func (g *GUI) buildWindowTab() *fyne.Container {
 		g.noWindowAspectRatioLockCheck,
 		g.backgroundColorEntry,
 		g.renderFitCombo,
-	)
+	}
 }

@@ -162,12 +162,24 @@ func (g *GUI) buildVideoSettingsRows() []fyne.CanvasObject {
 	return []fyne.CanvasObject{codecRow, fpsRow, orientRow, bufRow, cropRow}
 }
 
-func (g *GUI) buildVideoEngineTab() fyne.CanvasObject {
-	items := make([]fyne.CanvasObject, 0, 16)
+func (g *GUI) buildMediaTab() fyne.CanvasObject {
+	videoHeader := widget.NewLabelWithStyle("Video Engine & Camera", fyne.TextAlignLeading, fyne.TextStyle{Bold: true})
+	audioHeader := widget.NewLabelWithStyle("Audio Engine", fyne.TextAlignLeading, fyne.TextStyle{Bold: true})
+	recordHeader := widget.NewLabelWithStyle("Recording", fyne.TextAlignLeading, fyne.TextStyle{Bold: true})
+
+	items := make([]fyne.CanvasObject, 0, 30)
+	items = append(items, videoHeader)
+	items = append(items, g.buildBasicVideoRows()...)
 	items = append(items, g.buildCameraRows()...)
 	items = append(items, g.buildVideoSettingsRows()...)
 	items = append(items, g.buildV4L2Rows()...)
 	items = append(items, g.noPlaybackCheck)
+
+	items = append(items, widget.NewSeparator(), audioHeader)
+	items = append(items, g.buildAudioEngineRows()...)
+
+	items = append(items, widget.NewSeparator(), recordHeader)
+	items = append(items, g.buildRecordingRows()...)
 
 	return container.NewVScroll(container.NewVBox(items...))
 }

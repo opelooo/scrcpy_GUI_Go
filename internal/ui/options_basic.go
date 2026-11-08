@@ -58,7 +58,7 @@ func (g *GUI) initBasicWidgets() {
 	g.timeLimitEntry.SetPlaceHolder("seconds (0 = unlimited)")
 }
 
-func (g *GUI) buildBasicTab() *fyne.Container {
+func (g *GUI) buildBasicVideoRows() []fyne.CanvasObject {
 	bitrateRow := container.NewBorder(
 		nil, nil,
 		widget.NewLabel("video bit rate:"),
@@ -71,6 +71,14 @@ func (g *GUI) buildBasicTab() *fyne.Container {
 		container.NewGridWrap(fyne.NewSize(70, 36), g.maxSizeEntry),
 		nil,
 	)
+	return []fyne.CanvasObject{
+		g.videoOnCheck,
+		bitrateRow,
+		maxSizeRow,
+	}
+}
+
+func (g *GUI) buildRecordingRows() []fyne.CanvasObject {
 	recVideoRow := container.NewBorder(
 		nil, nil,
 		g.recordVideoCheck,
@@ -101,16 +109,12 @@ func (g *GUI) buildBasicTab() *fyne.Container {
 		nil,
 		g.timeLimitEntry,
 	)
-
-	return container.NewVBox(
-		bitrateRow,
-		maxSizeRow,
-		g.videoOnCheck,
+	return []fyne.CanvasObject{
 		recVideoRow,
 		recAudioRow,
 		recPathRow,
 		recOrientRow,
 		timeLimitRow,
-	)
+	}
 }
 

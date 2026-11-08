@@ -36,7 +36,7 @@ func (g *GUI) initDisplayWidgets() {
 	}
 }
 
-func (g *GUI) buildDisplayTab() *fyne.Container {
+func (g *GUI) buildDisplayRows() []fyne.CanvasObject {
 	dispIDRow := container.NewBorder(
 		nil, nil,
 		widget.NewLabel("Mirror Display ID:"),
@@ -58,7 +58,7 @@ func (g *GUI) buildDisplayTab() *fyne.Container {
 		g.displayIMEPolicyCombo,
 	)
 
-	return container.NewVBox(
+	return []fyne.CanvasObject{
 		dispIDRow,
 		widget.NewSeparator(),
 		g.newDisplayCheck,
@@ -67,5 +67,18 @@ func (g *GUI) buildDisplayTab() *fyne.Container {
 		g.noVDDestroyContentCheck,
 		imeRow,
 		g.flexDisplayCheck,
-	)
+	}
+}
+
+func (g *GUI) buildDisplayAndWindowTab() fyne.CanvasObject {
+	windowHeader := widget.NewLabelWithStyle("Window Modes & Geometry", fyne.TextAlignLeading, fyne.TextStyle{Bold: true})
+	displayHeader := widget.NewLabelWithStyle("Display & Virtual Screen", fyne.TextAlignLeading, fyne.TextStyle{Bold: true})
+
+	items := make([]fyne.CanvasObject, 0, 25)
+	items = append(items, windowHeader)
+	items = append(items, g.buildWindowRows()...)
+	items = append(items, widget.NewSeparator(), displayHeader)
+	items = append(items, g.buildDisplayRows()...)
+
+	return container.NewVScroll(container.NewVBox(items...))
 }

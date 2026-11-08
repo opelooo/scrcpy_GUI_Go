@@ -60,18 +60,49 @@ func getScrcpyShortcuts(mod string) []domain.ShortcutItem {
 	}
 }
 
+func buildShortcutRow(it domain.ShortcutItem) fyne.CanvasObject {
+	actionLabel := widget.NewLabelWithStyle(it.Action, fyne.TextAlignLeading, fyne.TextStyle{Bold: true})
+	keyLabel := widget.NewLabelWithStyle(it.KeySequence, fyne.TextAlignLeading, fyne.TextStyle{Monospace: true})
+	descLabel := widget.NewLabel(it.Description)
+	descLabel.Wrapping = fyne.TextWrapWord
+
+	return container.NewBorder(
+		nil, nil,
+		container.NewGridWrap(fyne.NewSize(200, 32), actionLabel),
+		nil,
+		container.NewBorder(
+			nil, nil,
+			container.NewGridWrap(fyne.NewSize(230, 32), keyLabel),
+			nil,
+			descLabel,
+		),
+	)
+}
+
 func buildCategoryTable(items []domain.ShortcutItem) fyne.CanvasObject {
-	grid := container.NewGridWithColumns(3)
-	grid.Add(widget.NewLabelWithStyle("Action", fyne.TextAlignLeading, fyne.TextStyle{Bold: true}))
-	grid.Add(widget.NewLabelWithStyle("Shortcut", fyne.TextAlignLeading, fyne.TextStyle{Bold: true}))
-	grid.Add(widget.NewLabelWithStyle("Description", fyne.TextAlignLeading, fyne.TextStyle{Bold: true}))
+	rows := make([]fyne.CanvasObject, 0, len(items)+2)
+
+	headerAction := widget.NewLabelWithStyle("Action", fyne.TextAlignLeading, fyne.TextStyle{Bold: true})
+	headerKey := widget.NewLabelWithStyle("Shortcut", fyne.TextAlignLeading, fyne.TextStyle{Bold: true})
+	headerDesc := widget.NewLabelWithStyle("Description", fyne.TextAlignLeading, fyne.TextStyle{Bold: true})
+
+	header := container.NewBorder(
+		nil, nil,
+		container.NewGridWrap(fyne.NewSize(200, 32), headerAction),
+		nil,
+		container.NewBorder(
+			nil, nil,
+			container.NewGridWrap(fyne.NewSize(230, 32), headerKey),
+			nil,
+			headerDesc,
+		),
+	)
+	rows = append(rows, header, widget.NewSeparator())
 
 	for _, it := range items {
-		grid.Add(widget.NewLabel(it.Action))
-		grid.Add(widget.NewLabelWithStyle(it.KeySequence, fyne.TextAlignLeading, fyne.TextStyle{Monospace: true}))
-		grid.Add(widget.NewLabel(it.Description))
+		rows = append(rows, buildShortcutRow(it))
 	}
-	return grid
+	return container.NewVBox(rows...)
 }
 
 func buildShortcutsCategoryTabs(shortcuts []domain.ShortcutItem) *container.AppTabs {
@@ -107,6 +138,7 @@ func (g *GUI) showShortcutsCheatsheetDialog() {
 	content := container.NewBorder(headerLabel, nil, nil, nil, tabs)
 
 	dlg := dialog.NewCustom("scrcpy Shortcuts Cheatsheet", "Close", content, g.window)
-	dlg.Resize(fyne.NewSize(620, 420))
+	dlg.Resize(fyne.NewSize(840, 520))
 	dlg.Show()
 }
+

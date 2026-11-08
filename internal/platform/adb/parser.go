@@ -387,12 +387,54 @@ func appendWindowArgs(args []string, opts domain.ScrcpyOptions) []string {
 	return appendWindowAdvancedArgs(args, opts)
 }
 
+func appendDisplayIMEPolicyArgs(args []string, opts domain.ScrcpyOptions) []string {
+	pol := strings.TrimSpace(opts.DisplayIMEPolicy)
+	if pol != "" && pol != "default" && pol != "Default" {
+		args = append(args, fmt.Sprintf("--display-ime-policy=%s", pol))
+	}
+	return args
+}
+
+func appendNewDisplayArgs(args []string, opts domain.ScrcpyOptions) []string {
+	res := strings.TrimSpace(opts.NewDisplayResolution)
+	if res != "" {
+		args = append(args, fmt.Sprintf("--new-display=%s", res))
+	} else {
+		args = append(args, "--new-display")
+	}
+
+	if opts.NoVDSystemDecorations {
+		args = append(args, "--no-vd-system-decorations")
+	}
+	if opts.NoVDDestroyContent {
+		args = append(args, "--no-vd-destroy-content")
+	}
+	if opts.FlexDisplay {
+		args = append(args, "--flex-display")
+	}
+	return appendDisplayIMEPolicyArgs(args, opts)
+}
+
+func appendDisplayArgs(args []string, opts domain.ScrcpyOptions) []string {
+	if strings.TrimSpace(opts.VideoSource) == "camera" {
+		return args
+	}
+	if opts.NewDisplay {
+		return appendNewDisplayArgs(args, opts)
+	}
+	if did := strings.TrimSpace(opts.DisplayID); did != "" && did != "0" {
+		args = append(args, fmt.Sprintf("--display-id=%s", did))
+	}
+	return appendDisplayIMEPolicyArgs(args, opts)
+}
+
 // BuildScrcpyArgs constructs the CLI arguments for scrcpy execution.
 func BuildScrcpyArgs(opts domain.ScrcpyOptions) []string {
 	var args []string
 	args = appendConnectionArgs(args, opts)
 	args = appendVideoArgs(args, opts)
 	args = appendCameraArgs(args, opts)
+	args = appendDisplayArgs(args, opts)
 	args = appendAudioArgs(args, opts)
 	args = appendControlArgs(args, opts)
 	args = appendDeviceArgs(args, opts)

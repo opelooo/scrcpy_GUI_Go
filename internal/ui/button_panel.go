@@ -110,6 +110,13 @@ func (g *GUI) collectScrcpyOptions() domain.ScrcpyOptions {
 		NoWindowAspectRatioLock: g.noWindowAspectRatioLockCheck.Visible() && g.noWindowAspectRatioLockCheck.Checked,
 		BackgroundColor:         g.backgroundColorEntry.Text,
 		RenderFit:               g.renderFitCombo.Selected,
+		DisplayID:               g.displayIDEntry.Text,
+		NewDisplay:              g.newDisplayCheck.Checked,
+		NewDisplayResolution:    g.newDisplayResEntry.Text,
+		NoVDSystemDecorations:   g.noVDSystemDecorationsCheck.Checked,
+		NoVDDestroyContent:      g.noVDDestroyContentCheck.Checked,
+		DisplayIMEPolicy:        g.displayIMEPolicyCombo.Selected,
+		FlexDisplay:             g.flexDisplayCheck.Visible() && g.flexDisplayCheck.Checked,
 	}
 }
 

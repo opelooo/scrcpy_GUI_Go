@@ -307,6 +307,7 @@ func (c *Client) GetScrcpyCapabilities() (domain.ScrcpyCapabilities, error) {
 	if major > 3 || (major == 3 && minor >= 4) {
 		caps.HasKeepActive = true
 		caps.HasWindowAdvanced = true
+		caps.HasFlexDisplay = true
 		return caps, nil
 	}
 
@@ -318,6 +319,9 @@ func (c *Client) GetScrcpyCapabilities() (domain.ScrcpyCapabilities, error) {
 		}
 		if strings.Contains(helpText, "--render-fit") {
 			caps.HasWindowAdvanced = true
+		}
+		if strings.Contains(helpText, "--flex-display") {
+			caps.HasFlexDisplay = true
 		}
 	}
 

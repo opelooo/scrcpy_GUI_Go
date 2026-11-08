@@ -99,6 +99,13 @@ type ScrcpyOptions struct {
 	NoWindowAspectRatioLock bool
 	BackgroundColor         string
 	RenderFit               string
+	DisplayID               string
+	NewDisplay              bool
+	NewDisplayResolution    string
+	NoVDSystemDecorations   bool
+	NoVDDestroyContent      bool
+	DisplayIMEPolicy        string
+	FlexDisplay             bool
 }
 
 // ScrcpyCapabilities defines supported scrcpy binary capabilities for backward compatibility.
@@ -109,6 +116,7 @@ type ScrcpyCapabilities struct {
 	Patch             int
 	HasKeepActive     bool
 	HasWindowAdvanced bool
+	HasFlexDisplay    bool
 }
 
 // ADBClient defines the low-level ADB/scrcpy integration interface.

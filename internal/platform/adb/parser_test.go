@@ -758,3 +758,92 @@ func TestConflictRecordOrientationWithoutVideo(t *testing.T) {
 		t.Errorf("expected --record-orientation to be omitted without video, got %q", joined)
 	}
 }
+
+func TestBuildScrcpyArgsNewDisplayDefault(t *testing.T) {
+	opts := domain.ScrcpyOptions{
+		DeviceSerial: "DEV_DISP",
+		NewDisplay:   true,
+	}
+
+	args := BuildScrcpyArgs(opts)
+	joined := strings.Join(args, " ")
+
+	if !strings.Contains(joined, "--new-display") {
+		t.Errorf("expected --new-display in args, got %q", joined)
+	}
+}
+
+func TestBuildScrcpyArgsNewDisplayCustomResolution(t *testing.T) {
+	opts := domain.ScrcpyOptions{
+		DeviceSerial:          "DEV_DISP",
+		NewDisplay:            true,
+		NewDisplayResolution:  "1920x1080/420",
+		NoVDSystemDecorations: true,
+		NoVDDestroyContent:    true,
+		DisplayIMEPolicy:      "local",
+		FlexDisplay:           true,
+	}
+
+	args := BuildScrcpyArgs(opts)
+	joined := strings.Join(args, " ")
+	expectedFlags := []string{
+		"--new-display=1920x1080/420",
+		"--no-vd-system-decorations",
+		"--no-vd-destroy-content",
+		"--display-ime-policy=local",
+		"--flex-display",
+	}
+
+	for _, flag := range expectedFlags {
+		if !strings.Contains(joined, flag) {
+			t.Errorf("expected %q in args, got %q", flag, joined)
+		}
+	}
+}
+
+func TestBuildScrcpyArgsDisplayID(t *testing.T) {
+	opts := domain.ScrcpyOptions{
+		DeviceSerial: "DEV_DISP",
+		DisplayID:    "2",
+	}
+
+	args := BuildScrcpyArgs(opts)
+	joined := strings.Join(args, " ")
+
+	if !strings.Contains(joined, "--display-id=2") {
+		t.Errorf("expected --display-id=2 in args, got %q", joined)
+	}
+}
+
+func TestConflictNewDisplayOverridesDisplayID(t *testing.T) {
+	opts := domain.ScrcpyOptions{
+		DeviceSerial: "DEV_DISP",
+		NewDisplay:   true,
+		DisplayID:    "2",
+	}
+
+	args := BuildScrcpyArgs(opts)
+	joined := strings.Join(args, " ")
+
+	if !strings.Contains(joined, "--new-display") {
+		t.Errorf("expected --new-display in args, got %q", joined)
+	}
+	if strings.Contains(joined, "--display-id") {
+		t.Errorf("expected --display-id to be omitted when new-display is set, got %q", joined)
+	}
+}
+
+func TestConflictNewDisplayOmittedOnCameraSource(t *testing.T) {
+	opts := domain.ScrcpyOptions{
+		DeviceSerial: "DEV_DISP",
+		VideoSource:  "camera",
+		NewDisplay:   true,
+	}
+
+	args := BuildScrcpyArgs(opts)
+	joined := strings.Join(args, " ")
+
+	if strings.Contains(joined, "--new-display") {
+		t.Errorf("expected --new-display to be omitted when video-source is camera, got %q", joined)
+	}
+}

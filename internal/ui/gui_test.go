@@ -192,4 +192,28 @@ func TestGUIInitialization(t *testing.T) {
 	if gui.timeLimitEntry.Text != "" {
 		t.Errorf("expected empty time limit entry initially")
 	}
+
+	// Verify display engine controls initialization
+	if gui.newDisplayCheck.Checked {
+		t.Errorf("expected newDisplayCheck to be unchecked initially")
+	}
+	if gui.noVDSystemDecorationsCheck.Checked {
+		t.Errorf("expected noVDSystemDecorationsCheck to be unchecked initially")
+	}
+	if gui.noVDDestroyContentCheck.Checked {
+		t.Errorf("expected noVDDestroyContentCheck to be unchecked initially")
+	}
+	if gui.displayIMEPolicyCombo.Selected != "default" {
+		t.Errorf("expected default IME policy, got %s", gui.displayIMEPolicyCombo.Selected)
+	}
+	if gui.flexDisplayCheck.Visible() {
+		t.Errorf("expected flexDisplayCheck to be hidden on scrcpy 3.3.4")
+	}
+
+	// Test conflict callback: checking newDisplay clears displayID
+	gui.displayIDEntry.SetText("1")
+	gui.newDisplayCheck.SetChecked(true)
+	if gui.displayIDEntry.Text != "" {
+		t.Errorf("expected displayIDEntry to be cleared when newDisplay is checked")
+	}
 }

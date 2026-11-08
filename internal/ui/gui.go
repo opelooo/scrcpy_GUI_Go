@@ -101,6 +101,15 @@ type GUI struct {
 	noWindowAspectRatioLockCheck *widget.Check
 	backgroundColorEntry         *widget.Entry
 	renderFitCombo               *widget.Select
+
+	// Display Engine widgets (virtual-display.md)
+	displayIDEntry             *widget.Entry
+	newDisplayCheck            *widget.Check
+	newDisplayResEntry         *widget.Entry
+	noVDSystemDecorationsCheck *widget.Check
+	noVDDestroyContentCheck    *widget.Check
+	displayIMEPolicyCombo      *widget.Select
+	flexDisplayCheck           *widget.Check
 }
 
 // NewGUI constructs the GUI and sets up the layout.
@@ -123,6 +132,7 @@ func (g *GUI) initWidgets() {
 	g.initBasicWidgets()
 	g.initDeviceWidgets()
 	g.initWindowWidgets()
+	g.initDisplayWidgets()
 	g.initVideoWidgets()
 	g.initAudioWidgets()
 	g.initControlWidgets()
@@ -133,6 +143,7 @@ func (g *GUI) buildOptionsPanel() *fyne.Container {
 		container.NewTabItem("Basic & Rec", g.buildBasicTab()),
 		container.NewTabItem("Device", g.buildDeviceTab()),
 		container.NewTabItem("Window", g.buildWindowTab()),
+		container.NewTabItem("Display", g.buildDisplayTab()),
 		container.NewTabItem("Video", g.buildVideoEngineTab()),
 		container.NewTabItem("Audio", g.buildAudioEngineTab()),
 		container.NewTabItem("Control", g.buildControlTab()),

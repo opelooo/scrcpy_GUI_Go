@@ -33,8 +33,11 @@ type GUI struct {
 	videoOnCheck     *widget.Check
 	recordVideoCheck *widget.Check
 	videoFormatCombo *widget.Select
-	recordAudioCheck *widget.Check
-	audioFormatCombo *widget.Select
+	recordAudioCheck       *widget.Check
+	audioFormatCombo       *widget.Select
+	recordPathEntry        *widget.Entry
+	recordOrientationCombo *widget.Select
+	timeLimitEntry         *widget.Entry
 
 	// Device widgets (device.md)
 	screenOnCheck         *widget.Check

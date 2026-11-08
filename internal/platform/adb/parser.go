@@ -208,20 +208,61 @@ func appendControlArgs(args []string, opts domain.ScrcpyOptions) []string {
 	return args
 }
 
+func determineRecordFilename(opts domain.ScrcpyOptions) string {
+	if custom := strings.TrimSpace(opts.RecordPath); custom != "" {
+		return custom
+	}
+	ts := time.Now().Format("20060102_150405")
+	if opts.RecordVideo && opts.VideoFormat != "" {
+		return fmt.Sprintf("scrcpy_record_%s.%s", ts, opts.VideoFormat)
+	}
+	if opts.RecordAudio && opts.AudioFormat != "" {
+		return fmt.Sprintf("scrcpy_record_%s.%s", ts, opts.AudioFormat)
+	}
+	return ""
+}
+
+func appendRecordOutputArgs(args []string, opts domain.ScrcpyOptions) []string {
+	if !opts.RecordVideo && !opts.RecordAudio {
+		return args
+	}
+
+	filename := determineRecordFilename(opts)
+	if filename != "" {
+		args = append(args, fmt.Sprintf("--record=%s", filename))
+	}
+	if fmtVal := strings.TrimSpace(opts.RecordFormat); fmtVal != "" && fmtVal != "auto" && fmtVal != "Auto" {
+		args = append(args, fmt.Sprintf("--record-format=%s", fmtVal))
+	}
+	return args
+}
+
+func appendRecordOrientationArgs(args []string, opts domain.ScrcpyOptions) []string {
+	if !opts.RecordVideo || !opts.VideoOn {
+		return args
+	}
+	ro := strings.TrimSpace(opts.RecordOrientation)
+	if ro != "" && ro != "default" && ro != "Default" {
+		args = append(args, fmt.Sprintf("--record-orientation=%s", ro))
+	}
+	return args
+}
+
+func appendTimeLimitArgs(args []string, opts domain.ScrcpyOptions) []string {
+	tl := strings.TrimSpace(opts.TimeLimit)
+	if tl != "" && tl != "0" {
+		args = append(args, fmt.Sprintf("--time-limit=%s", tl))
+	}
+	return args
+}
+
 func appendRecordArgs(args []string, opts domain.ScrcpyOptions) []string {
+	args = appendTimeLimitArgs(args, opts)
 	if !opts.VideoOn && !opts.AudioOn {
 		return args
 	}
-	if opts.RecordVideo && opts.VideoFormat != "" {
-		ts := time.Now().Format("20060102_150405")
-		filename := fmt.Sprintf("scrcpy_record_%s.%s", ts, opts.VideoFormat)
-		return append(args, fmt.Sprintf("--record=%s", filename))
-	}
-	if opts.RecordAudio && opts.AudioFormat != "" {
-		ts := time.Now().Format("20060102_150405")
-		filename := fmt.Sprintf("scrcpy_record_%s.%s", ts, opts.AudioFormat)
-		return append(args, fmt.Sprintf("--record=%s", filename))
-	}
+	args = appendRecordOutputArgs(args, opts)
+	args = appendRecordOrientationArgs(args, opts)
 	return args
 }
 

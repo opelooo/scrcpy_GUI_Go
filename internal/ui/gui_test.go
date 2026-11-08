@@ -181,4 +181,15 @@ func TestGUIInitialization(t *testing.T) {
 	if gui.alwaysOnTopCheck.Checked {
 		t.Errorf("expected alwaysOnTopCheck to be unchecked when noWindow is checked")
 	}
+
+	// Verify recording controls initialization
+	if gui.recordOrientationCombo.Selected != "default" {
+		t.Errorf("expected default record orientation, got %s", gui.recordOrientationCombo.Selected)
+	}
+	if gui.recordPathEntry.Text != "" {
+		t.Errorf("expected empty record path entry initially")
+	}
+	if gui.timeLimitEntry.Text != "" {
+		t.Errorf("expected empty time limit entry initially")
+	}
 }

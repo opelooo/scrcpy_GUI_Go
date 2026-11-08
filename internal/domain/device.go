@@ -37,10 +37,14 @@ type ScrcpyOptions struct {
 	VideoOn      bool
 	ScreenOn     bool
 	StayAwake    bool
-	RecordVideo  bool
-	VideoFormat  string
-	RecordAudio  bool
-	AudioFormat  string
+	RecordVideo       bool
+	VideoFormat       string
+	RecordAudio       bool
+	AudioFormat       string
+	RecordPath        string
+	RecordFormat      string
+	RecordOrientation string
+	TimeLimit         string
 	SelectUSB    bool
 	SelectTCPIP  bool
 	TCPIPAddress string

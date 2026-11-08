@@ -685,3 +685,76 @@ func TestBuildScrcpyArgsWindowAdvanced(t *testing.T) {
 		}
 	}
 }
+
+func TestBuildScrcpyArgsRecordCustomFilename(t *testing.T) {
+	opts := domain.ScrcpyOptions{
+		DeviceSerial: "DEV_REC",
+		VideoOn:      true,
+		RecordVideo:  true,
+		RecordPath:   "/tmp/my_custom_record.mkv",
+		RecordFormat: "mkv",
+	}
+
+	args := BuildScrcpyArgs(opts)
+	joined := strings.Join(args, " ")
+	expectedFlags := []string{
+		"--record=/tmp/my_custom_record.mkv",
+		"--record-format=mkv",
+	}
+
+	for _, flag := range expectedFlags {
+		if !strings.Contains(joined, flag) {
+			t.Errorf("expected %q in args, got %q", flag, joined)
+		}
+	}
+}
+
+func TestBuildScrcpyArgsRecordOrientation(t *testing.T) {
+	opts := domain.ScrcpyOptions{
+		DeviceSerial:      "DEV_REC",
+		VideoOn:           true,
+		RecordVideo:       true,
+		VideoFormat:       "mp4",
+		RecordOrientation: "270",
+	}
+
+	args := BuildScrcpyArgs(opts)
+	joined := strings.Join(args, " ")
+
+	if !strings.Contains(joined, "--record-orientation=270") {
+		t.Errorf("expected --record-orientation=270 in args, got %q", joined)
+	}
+}
+
+func TestBuildScrcpyArgsRecordTimeLimit(t *testing.T) {
+	opts := domain.ScrcpyOptions{
+		DeviceSerial: "DEV_REC",
+		VideoOn:      true,
+		TimeLimit:    "45",
+	}
+
+	args := BuildScrcpyArgs(opts)
+	joined := strings.Join(args, " ")
+
+	if !strings.Contains(joined, "--time-limit=45") {
+		t.Errorf("expected --time-limit=45 in args, got %q", joined)
+	}
+}
+
+func TestConflictRecordOrientationWithoutVideo(t *testing.T) {
+	opts := domain.ScrcpyOptions{
+		DeviceSerial:      "DEV_REC",
+		VideoOn:           false,
+		AudioOn:           true,
+		RecordAudio:       true,
+		AudioFormat:       "opus",
+		RecordOrientation: "90",
+	}
+
+	args := BuildScrcpyArgs(opts)
+	joined := strings.Join(args, " ")
+
+	if strings.Contains(joined, "--record-orientation") {
+		t.Errorf("expected --record-orientation to be omitted without video, got %q", joined)
+	}
+}

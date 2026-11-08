@@ -45,6 +45,17 @@ func (g *GUI) initBasicWidgets() {
 	g.recordAudioCheck = widget.NewCheck("Record Audio", nil)
 	g.audioFormatCombo = widget.NewSelect([]string{"m4a", "wav", "flac", "opus", "aac", "mka"}, nil)
 	g.audioFormatCombo.SetSelected("m4a")
+
+	g.recordPathEntry = widget.NewEntry()
+	g.recordPathEntry.SetPlaceHolder("Auto timestamp if empty")
+
+	g.recordOrientationCombo = widget.NewSelect([]string{
+		"default", "0", "90", "180", "270", "flip0", "flip90", "flip180", "flip270",
+	}, nil)
+	g.recordOrientationCombo.SetSelected("default")
+
+	g.timeLimitEntry = widget.NewEntry()
+	g.timeLimitEntry.SetPlaceHolder("seconds (0 = unlimited)")
 }
 
 func (g *GUI) buildBasicTab() *fyne.Container {
@@ -72,6 +83,24 @@ func (g *GUI) buildBasicTab() *fyne.Container {
 		container.NewGridWrap(fyne.NewSize(85, 36), g.audioFormatCombo),
 		nil,
 	)
+	recPathRow := container.NewBorder(
+		nil, nil,
+		widget.NewLabel("record output:"),
+		nil,
+		g.recordPathEntry,
+	)
+	recOrientRow := container.NewBorder(
+		nil, nil,
+		widget.NewLabel("record orient:"),
+		nil,
+		g.recordOrientationCombo,
+	)
+	timeLimitRow := container.NewBorder(
+		nil, nil,
+		widget.NewLabel("time limit:"),
+		nil,
+		g.timeLimitEntry,
+	)
 
 	return container.NewVBox(
 		bitrateRow,
@@ -79,6 +108,9 @@ func (g *GUI) buildBasicTab() *fyne.Container {
 		g.videoOnCheck,
 		recVideoRow,
 		recAudioRow,
+		recPathRow,
+		recOrientRow,
+		timeLimitRow,
 	)
 }
 

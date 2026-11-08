@@ -70,6 +70,11 @@ type ScrcpyOptions struct {
 	CameraFacing         string
 	CameraSize           string
 	CameraFPS            string
+	PreferText           bool
+	RawKeyEvents         bool
+	NoKeyRepeat          bool
+	ShortcutMod          string
+	OTGMode              bool
 }
 
 // ADBClient defines the low-level ADB/scrcpy integration interface.

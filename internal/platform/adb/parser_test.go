@@ -188,6 +188,11 @@ func TestBuildScrcpyArgsControlFeatures(t *testing.T) {
 		NoClipboardAutosync: true,
 		LegacyPaste:         true,
 		PushTarget:          "/sdcard/Movies/",
+		PreferText:          true,
+		RawKeyEvents:        true,
+		NoKeyRepeat:         true,
+		ShortcutMod:         "lctrl+lalt",
+		OTGMode:             true,
 	}
 
 	args := BuildScrcpyArgs(opts)
@@ -199,6 +204,11 @@ func TestBuildScrcpyArgsControlFeatures(t *testing.T) {
 		"--no-clipboard-autosync",
 		"--legacy-paste",
 		"--push-target=/sdcard/Movies/",
+		"--prefer-text",
+		"--raw-key-events",
+		"--no-key-repeat",
+		"--shortcut-mod=lctrl+lalt",
+		"--otg",
 	}
 
 	joined := strings.Join(args, " ")

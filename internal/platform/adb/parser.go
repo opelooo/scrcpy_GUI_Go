@@ -161,6 +161,9 @@ func appendAudioArgs(args []string, opts domain.ScrcpyOptions) []string {
 }
 
 func appendControlArgs(args []string, opts domain.ScrcpyOptions) []string {
+	if opts.OTGMode {
+		args = append(args, "--otg")
+	}
 	if opts.NoControl {
 		return append(args, "--no-control")
 	}
@@ -178,6 +181,18 @@ func appendControlArgs(args []string, opts domain.ScrcpyOptions) []string {
 	}
 	if opts.LegacyPaste {
 		args = append(args, "--legacy-paste")
+	}
+	if opts.PreferText {
+		args = append(args, "--prefer-text")
+	}
+	if opts.RawKeyEvents {
+		args = append(args, "--raw-key-events")
+	}
+	if opts.NoKeyRepeat {
+		args = append(args, "--no-key-repeat")
+	}
+	if sm := strings.TrimSpace(opts.ShortcutMod); sm != "" && sm != "default" && sm != "Default" {
+		args = append(args, fmt.Sprintf("--shortcut-mod=%s", sm))
 	}
 	if target := strings.TrimSpace(opts.PushTarget); target != "" && target != "/sdcard/Download/" {
 		args = append(args, fmt.Sprintf("--push-target=%s", target))

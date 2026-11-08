@@ -86,8 +86,15 @@ func (g *GUI) buildControlCheckboxes() []fyne.CanvasObject {
 }
 
 func (g *GUI) buildControlTab() fyne.CanvasObject {
-	items := make([]fyne.CanvasObject, 0, 15)
+	hintLabel := widget.NewLabelWithStyle(
+		"Tip: Press Left Alt (or Alt+Tab) to release mouse capture",
+		fyne.TextAlignLeading,
+		fyne.TextStyle{Italic: true},
+	)
+
+	items := make([]fyne.CanvasObject, 0, 16)
 	items = append(items, g.buildControlModeRows()...)
+	items = append(items, hintLabel)
 	items = append(items, g.buildControlCheckboxes()...)
 
 	return container.NewVScroll(container.NewVBox(items...))

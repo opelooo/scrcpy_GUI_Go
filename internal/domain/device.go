@@ -75,6 +75,7 @@ type ScrcpyOptions struct {
 	NoKeyRepeat          bool
 	ShortcutMod          string
 	OTGMode              bool
+	GamepadMode          string
 }
 
 // ADBClient defines the low-level ADB/scrcpy integration interface.

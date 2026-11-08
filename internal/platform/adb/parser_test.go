@@ -245,6 +245,42 @@ func TestBuildScrcpyArgsShortcutModDefault(t *testing.T) {
 	}
 }
 
+func TestBuildScrcpyArgsGamepadFeatures(t *testing.T) {
+	testCases := []struct {
+		mode     string
+		expected string
+	}{
+		{"uhid", "--gamepad=uhid"},
+		{"aoa", "--gamepad=aoa"},
+		{"disabled", "--gamepad=disabled"},
+	}
+
+	for _, tc := range testCases {
+		opts := domain.ScrcpyOptions{
+			DeviceSerial: "DEV_GP",
+			GamepadMode:  tc.mode,
+		}
+		args := BuildScrcpyArgs(opts)
+		joined := strings.Join(args, " ")
+		if !strings.Contains(joined, tc.expected) {
+			t.Errorf("expected %q in args, got %q", tc.expected, joined)
+		}
+	}
+}
+
+func TestBuildScrcpyArgsGamepadDefault(t *testing.T) {
+	opts := domain.ScrcpyOptions{
+		DeviceSerial: "DEV_GP",
+		GamepadMode:  "default",
+	}
+
+	args := BuildScrcpyArgs(opts)
+	joined := strings.Join(args, " ")
+	if strings.Contains(joined, "--gamepad") {
+		t.Errorf("expected --gamepad to be omitted when default, got %q", joined)
+	}
+}
+
 func TestBuildScrcpyArgsV4L2Features(t *testing.T) {
 	opts := domain.ScrcpyOptions{
 		DeviceSerial: "DEV_V4L2",

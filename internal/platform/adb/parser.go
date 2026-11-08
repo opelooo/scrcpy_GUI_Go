@@ -173,6 +173,9 @@ func appendControlArgs(args []string, opts domain.ScrcpyOptions) []string {
 	if mouse := strings.TrimSpace(opts.MouseMode); mouse != "" && mouse != "default" && mouse != "Default" {
 		args = append(args, fmt.Sprintf("--mouse=%s", mouse))
 	}
+	if gp := strings.TrimSpace(opts.GamepadMode); gp != "" && !strings.HasPrefix(strings.ToLower(gp), "default") {
+		args = append(args, fmt.Sprintf("--gamepad=%s", gp))
+	}
 	if opts.NoMouseHover {
 		args = append(args, "--no-mouse-hover")
 	}

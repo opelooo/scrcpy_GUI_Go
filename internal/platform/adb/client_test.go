@@ -28,3 +28,4 @@ func TestNewClientDiscovery(t *testing.T) {
 		t.Fatalf("expected valid paths, got ADB: %s, Scrcpy: %s", client.ADBPath, client.ScrcpyPath)
 	}
 }
+

@@ -68,6 +68,11 @@ type GUI struct {
 	noClipboardAutosyncCheck *widget.Check
 	legacyPasteCheck         *widget.Check
 	pushTargetEntry          *widget.Entry
+	preferTextCheck          *widget.Check
+	rawKeyEventsCheck        *widget.Check
+	noKeyRepeatCheck         *widget.Check
+	shortcutModCombo         *widget.Select
+	otgModeCheck             *widget.Check
 }
 
 // NewGUI constructs the GUI and sets up the layout.

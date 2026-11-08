@@ -82,6 +82,11 @@ func (g *GUI) collectScrcpyOptions() domain.ScrcpyOptions {
 		NoClipboardAutosync: g.noClipboardAutosyncCheck.Checked,
 		LegacyPaste:         g.legacyPasteCheck.Checked,
 		PushTarget:          g.pushTargetEntry.Text,
+		PreferText:          g.preferTextCheck.Checked,
+		RawKeyEvents:        g.rawKeyEventsCheck.Checked,
+		NoKeyRepeat:         g.noKeyRepeatCheck.Checked,
+		ShortcutMod:         g.shortcutModCombo.Selected,
+		OTGMode:             g.otgModeCheck.Checked,
 	}
 }
 

@@ -10,11 +10,29 @@ func (g *GUI) initControlWidgets() {
 	g.noControlCheck = widget.NewCheck("Read-Only (Disable Control)", nil)
 	g.noControlCheck.SetChecked(false)
 
+	g.otgModeCheck = widget.NewCheck("OTG Mode (Hardware KBM via USB)", nil)
+	g.otgModeCheck.SetChecked(false)
+
 	g.keyboardModeCombo = widget.NewSelect([]string{"default", "uhid", "aoa", "disabled"}, nil)
 	g.keyboardModeCombo.SetSelected("default")
 
 	g.mouseModeCombo = widget.NewSelect([]string{"default", "uhid", "aoa", "disabled"}, nil)
 	g.mouseModeCombo.SetSelected("default")
+
+	g.shortcutModCombo = widget.NewSelect([]string{"Default (Alt/Super)", "lctrl+lalt", "rctrl", "lalt", "lsuper"}, nil)
+	g.shortcutModCombo.SetSelected("Default (Alt/Super)")
+
+	g.pushTargetEntry = widget.NewEntry()
+	g.pushTargetEntry.SetText("/sdcard/Download/")
+
+	g.preferTextCheck = widget.NewCheck("Prefer Text Injection (Accents/Symbols)", nil)
+	g.preferTextCheck.SetChecked(false)
+
+	g.rawKeyEventsCheck = widget.NewCheck("Raw Key Events (Game/WASD Mode)", nil)
+	g.rawKeyEventsCheck.SetChecked(false)
+
+	g.noKeyRepeatCheck = widget.NewCheck("Disable Key Repeat on Hold", nil)
+	g.noKeyRepeatCheck.SetChecked(false)
 
 	g.noMouseHoverCheck = widget.NewCheck("Disable Mouse Hover", nil)
 	g.noMouseHoverCheck.SetChecked(false)
@@ -24,12 +42,9 @@ func (g *GUI) initControlWidgets() {
 
 	g.legacyPasteCheck = widget.NewCheck("Legacy Paste (Inject Keys)", nil)
 	g.legacyPasteCheck.SetChecked(false)
-
-	g.pushTargetEntry = widget.NewEntry()
-	g.pushTargetEntry.SetText("/sdcard/Download/")
 }
 
-func (g *GUI) buildControlTab() *fyne.Container {
+func (g *GUI) buildControlModeRows() []fyne.CanvasObject {
 	kbdRow := container.NewBorder(
 		nil, nil,
 		widget.NewLabel("keyboard mode:"),
@@ -42,21 +57,38 @@ func (g *GUI) buildControlTab() *fyne.Container {
 		container.NewGridWrap(fyne.NewSize(120, 36), g.mouseModeCombo),
 		nil,
 	)
+	modRow := container.NewBorder(
+		nil, nil,
+		widget.NewLabel("shortcut mod:"),
+		container.NewGridWrap(fyne.NewSize(180, 36), g.shortcutModCombo),
+		nil,
+	)
 	pushRow := container.NewBorder(
 		nil, nil,
 		widget.NewLabel("push target:"),
 		container.NewGridWrap(fyne.NewSize(180, 36), g.pushTargetEntry),
 		nil,
 	)
+	return []fyne.CanvasObject{kbdRow, mouseRow, modRow, pushRow}
+}
 
-	return container.NewVBox(
+func (g *GUI) buildControlCheckboxes() []fyne.CanvasObject {
+	return []fyne.CanvasObject{
 		g.noControlCheck,
-		kbdRow,
-		mouseRow,
-		pushRow,
+		g.otgModeCheck,
+		g.preferTextCheck,
+		g.rawKeyEventsCheck,
+		g.noKeyRepeatCheck,
 		g.noMouseHoverCheck,
 		g.noClipboardAutosyncCheck,
 		g.legacyPasteCheck,
-	)
+	}
 }
 
+func (g *GUI) buildControlTab() fyne.CanvasObject {
+	items := make([]fyne.CanvasObject, 0, 15)
+	items = append(items, g.buildControlModeRows()...)
+	items = append(items, g.buildControlCheckboxes()...)
+
+	return container.NewVScroll(container.NewVBox(items...))
+}

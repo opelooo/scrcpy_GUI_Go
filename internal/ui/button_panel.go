@@ -78,6 +78,7 @@ func (g *GUI) collectScrcpyOptions() domain.ScrcpyOptions {
 		NoControl:           g.noControlCheck.Checked,
 		KeyboardMode:        g.keyboardModeCombo.Selected,
 		MouseMode:           g.mouseModeCombo.Selected,
+		GamepadMode:         g.gamepadModeCombo.Selected,
 		NoMouseHover:        g.noMouseHoverCheck.Checked,
 		NoClipboardAutosync: g.noClipboardAutosyncCheck.Checked,
 		LegacyPaste:         g.legacyPasteCheck.Checked,

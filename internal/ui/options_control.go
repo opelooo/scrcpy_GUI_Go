@@ -19,6 +19,9 @@ func (g *GUI) initControlWidgets() {
 	g.mouseModeCombo = widget.NewSelect([]string{"default", "uhid", "aoa", "disabled"}, nil)
 	g.mouseModeCombo.SetSelected("default")
 
+	g.gamepadModeCombo = widget.NewSelect([]string{"default", "uhid", "aoa", "disabled"}, nil)
+	g.gamepadModeCombo.SetSelected("default")
+
 	g.shortcutModCombo = widget.NewSelect([]string{"Default (Alt/Super)", "lctrl+lalt", "rctrl", "lalt", "lsuper"}, nil)
 	g.shortcutModCombo.SetSelected("Default (Alt/Super)")
 
@@ -57,6 +60,12 @@ func (g *GUI) buildControlModeRows() []fyne.CanvasObject {
 		container.NewGridWrap(fyne.NewSize(120, 36), g.mouseModeCombo),
 		nil,
 	)
+	gpRow := container.NewBorder(
+		nil, nil,
+		widget.NewLabel("gamepad mode:"),
+		container.NewGridWrap(fyne.NewSize(120, 36), g.gamepadModeCombo),
+		nil,
+	)
 	modRow := container.NewBorder(
 		nil, nil,
 		widget.NewLabel("shortcut mod:"),
@@ -69,7 +78,7 @@ func (g *GUI) buildControlModeRows() []fyne.CanvasObject {
 		container.NewGridWrap(fyne.NewSize(180, 36), g.pushTargetEntry),
 		nil,
 	)
-	return []fyne.CanvasObject{kbdRow, mouseRow, modRow, pushRow}
+	return []fyne.CanvasObject{kbdRow, mouseRow, gpRow, modRow, pushRow}
 }
 
 func (g *GUI) buildControlCheckboxes() []fyne.CanvasObject {
@@ -92,7 +101,7 @@ func (g *GUI) buildControlTab() fyne.CanvasObject {
 		fyne.TextStyle{Italic: true},
 	)
 
-	items := make([]fyne.CanvasObject, 0, 16)
+	items := make([]fyne.CanvasObject, 0, 17)
 	items = append(items, g.buildControlModeRows()...)
 	items = append(items, hintLabel)
 	items = append(items, g.buildControlCheckboxes()...)

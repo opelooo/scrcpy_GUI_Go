@@ -64,6 +64,7 @@ type GUI struct {
 	noControlCheck           *widget.Check
 	keyboardModeCombo        *widget.Select
 	mouseModeCombo           *widget.Select
+	gamepadModeCombo         *widget.Select
 	noMouseHoverCheck        *widget.Check
 	noClipboardAutosyncCheck *widget.Check
 	legacyPasteCheck         *widget.Check

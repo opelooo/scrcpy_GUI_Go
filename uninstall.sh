@@ -55,3 +55,4 @@ elif [[ "$OS_TYPE" == "windows" ]]; then
 fi
 
 echo -e "${GREEN}[SUCCESS]${RESET} $APP_NAME has been uninstalled."
+

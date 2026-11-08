@@ -83,6 +83,7 @@ install_linux() {
     mkdir -p "$install_dir" "$bin_dir" "$desktop_dir" "$icon_hicolor" "$icon_dir"
 
     log_info "Installing binary and assets..."
+    rm -f "$install_dir/$BINARY_NAME"
     cp "dist/$BINARY_NAME" "$install_dir/$BINARY_NAME"
     chmod +x "$install_dir/$BINARY_NAME"
 
@@ -233,3 +234,4 @@ case "$OS_TYPE" in
         exit 1
         ;;
 esac
+

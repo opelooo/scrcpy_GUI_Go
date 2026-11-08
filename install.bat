@@ -70,3 +70,4 @@ echo Location:     %INSTALL_DIR%\%EXE_NAME%
 echo Shortcuts:    Placed on Desktop and Start Menu
 echo.
 pause
+

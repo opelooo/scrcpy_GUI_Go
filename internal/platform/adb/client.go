@@ -19,41 +19,127 @@ type Client struct {
 	ScrcpyPath string
 }
 
-// findProgram searches for an executable in PATH, working dir, and executable dir.
-func findProgram(name string) (string, error) {
+func findInPath(name string) (string, bool) {
 	if p, err := exec.LookPath(name); err == nil {
-		return p, nil
+		return p, true
 	}
-
 	if runtime.GOOS == "windows" && !strings.HasSuffix(strings.ToLower(name), ".exe") {
 		if p, err := exec.LookPath(name + ".exe"); err == nil {
-			return p, nil
+			return p, true
 		}
 	}
+	return "", false
+}
 
+func checkFileCandidate(cand string) (string, bool) {
+	if cand == "" {
+		return "", false
+	}
+	fi, err := os.Stat(cand)
+	if err == nil && !fi.IsDir() {
+		return cand, true
+	}
+	if runtime.GOOS == "windows" && !strings.HasSuffix(strings.ToLower(cand), ".exe") {
+		candExe := cand + ".exe"
+		if fiExe, errExe := os.Stat(candExe); errExe == nil && !fiExe.IsDir() {
+			return candExe, true
+		}
+	}
+	return "", false
+}
+
+func findInLocalDirs(name string) (string, bool) {
 	candidates := []string{
 		name,
 		"./" + name,
 	}
-	if runtime.GOOS == "windows" {
-		candidates = append(candidates, name+".exe", "./"+name+".exe")
-	}
-
 	if exe, err := os.Executable(); err == nil {
 		exeDir := filepath.Dir(exe)
 		candidates = append(candidates, filepath.Join(exeDir, name))
-		if runtime.GOOS == "windows" {
-			candidates = append(candidates, filepath.Join(exeDir, name+".exe"))
-		}
 	}
-
 	for _, cand := range candidates {
-		if fi, err := os.Stat(cand); err == nil && !fi.IsDir() {
-			return cand, nil
+		if path, ok := checkFileCandidate(cand); ok {
+			return path, true
 		}
 	}
+	return "", false
+}
 
-	return "", fmt.Errorf("%s not found in PATH or local directory", name)
+func getCommonCandidateDirs() []string {
+	var dirs []string
+	if env := os.Getenv("ANDROID_HOME"); env != "" {
+		dirs = append(dirs, filepath.Join(env, "platform-tools"))
+	}
+	if env := os.Getenv("ANDROID_SDK_ROOT"); env != "" {
+		dirs = append(dirs, filepath.Join(env, "platform-tools"))
+	}
+	if home, err := os.UserHomeDir(); err == nil && home != "" {
+		dirs = append(dirs,
+			filepath.Join(home, "Android", "Sdk", "platform-tools"),
+			filepath.Join(home, "Android", "sdk", "platform-tools"),
+			filepath.Join(home, ".android-sdk", "platform-tools"),
+			filepath.Join(home, "Library", "Android", "sdk", "platform-tools"),
+			filepath.Join(home, ".local", "bin"),
+			filepath.Join(home, "bin"),
+		)
+	}
+	if localApp := os.Getenv("LOCALAPPDATA"); localApp != "" {
+		dirs = append(dirs, filepath.Join(localApp, "Android", "Sdk", "platform-tools"))
+	}
+	dirs = append(dirs,
+		"/opt/android-sdk/platform-tools",
+		"/usr/lib/android-sdk/platform-tools",
+		"/usr/local/bin",
+		"/opt/homebrew/bin",
+	)
+	return dirs
+}
+
+func findInCommonDirs(name string) (string, bool) {
+	for _, dir := range getCommonCandidateDirs() {
+		cand := filepath.Join(dir, name)
+		if path, ok := checkFileCandidate(cand); ok {
+			return path, true
+		}
+	}
+	return "", false
+}
+
+func findViaWhereis(name string) (string, bool) {
+	if runtime.GOOS == "windows" {
+		return "", false
+	}
+	out, err := exec.Command("whereis", "-b", name).Output()
+	if err != nil {
+		return "", false
+	}
+	parts := strings.Fields(string(out))
+	if len(parts) <= 1 {
+		return "", false
+	}
+	for _, cand := range parts[1:] {
+		if path, ok := checkFileCandidate(cand); ok {
+			return path, true
+		}
+	}
+	return "", false
+}
+
+// findProgram searches for an executable in PATH, working dir, common SDK locations, and whereis.
+func findProgram(name string) (string, error) {
+	if p, ok := findInPath(name); ok {
+		return p, nil
+	}
+	if p, ok := findInLocalDirs(name); ok {
+		return p, nil
+	}
+	if p, ok := findInCommonDirs(name); ok {
+		return p, nil
+	}
+	if p, ok := findViaWhereis(name); ok {
+		return p, nil
+	}
+	return "", fmt.Errorf("%s not found in PATH, standard SDK folders, or local directory", name)
 }
 
 // NewClient initializes the ADB and scrcpy client, verifying both tools exist.
@@ -61,6 +147,13 @@ func NewClient() (*Client, error) {
 	adb, err := findProgram("adb")
 	if err != nil {
 		return nil, fmt.Errorf("Cannot find adb in environment or folder!\nPlease install adb or place adb executable next to this app.\n%w", err)
+	}
+
+	// Ensure adb directory is in PATH for downstream subprocesses (e.g. scrcpy)
+	adbDir := filepath.Dir(adb)
+	currPath := os.Getenv("PATH")
+	if !strings.Contains(currPath, adbDir) {
+		_ = os.Setenv("PATH", adbDir+string(os.PathListSeparator)+currPath)
 	}
 
 	scrcpy, err := findProgram("scrcpy")

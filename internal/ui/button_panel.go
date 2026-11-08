@@ -117,16 +117,20 @@ func (g *GUI) collectScrcpyOptions() domain.ScrcpyOptions {
 		NoVDDestroyContent:      g.noVDDestroyContentCheck.Checked,
 		DisplayIMEPolicy:        g.displayIMEPolicyCombo.Selected,
 		FlexDisplay:             g.flexDisplayCheck.Visible() && g.flexDisplayCheck.Checked,
+		TunnelHost:              g.tunnelHostEntry.Text,
+		TunnelPort:              g.tunnelPortEntry.Text,
+		ForceAdbForward:         g.forceAdbForwardCheck.Checked,
+		PortRange:               g.portRangeEntry.Text,
+		ADBServerHost:           g.adbServerHostEntry.Text,
 	}
 }
 
 func (g *GUI) runScrcpy() {
-	if g.selectedDevice == "" {
+	opts := g.collectScrcpyOptions()
+	if g.selectedDevice == "" && opts.TunnelHost == "" && opts.ADBServerHost == "" {
 		dialog.ShowInformation("Info", "Please select device", g.window)
 		return
 	}
-
-	opts := g.collectScrcpyOptions()
 	progress := dialog.NewCustomWithoutButtons(
 		"Running scrcpy",
 		container.NewVBox(

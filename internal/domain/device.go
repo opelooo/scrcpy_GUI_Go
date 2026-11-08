@@ -106,6 +106,11 @@ type ScrcpyOptions struct {
 	NoVDDestroyContent      bool
 	DisplayIMEPolicy        string
 	FlexDisplay             bool
+	TunnelHost              string
+	TunnelPort              string
+	ForceAdbForward         bool
+	PortRange               string
+	ADBServerHost           string
 }
 
 // ScrcpyCapabilities defines supported scrcpy binary capabilities for backward compatibility.
@@ -130,6 +135,7 @@ type ADBClient interface {
 	Disconnect(target string) error
 	Pair(ip string, port int, code string) error
 	ExecuteScrcpy(args []string) error
+	ExecuteScrcpyWithEnv(args []string, extraEnv []string) error
 	GetScrcpyCapabilities() (ScrcpyCapabilities, error)
 }
 

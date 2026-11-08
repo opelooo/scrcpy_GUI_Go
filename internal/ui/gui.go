@@ -110,6 +110,13 @@ type GUI struct {
 	noVDDestroyContentCheck    *widget.Check
 	displayIMEPolicyCombo      *widget.Select
 	flexDisplayCheck           *widget.Check
+
+	// Tunnel Engine widgets (tunnels.md)
+	adbServerHostEntry   *widget.Entry
+	tunnelHostEntry      *widget.Entry
+	tunnelPortEntry      *widget.Entry
+	forceAdbForwardCheck *widget.Check
+	portRangeEntry       *widget.Entry
 }
 
 // NewGUI constructs the GUI and sets up the layout.
@@ -133,6 +140,7 @@ func (g *GUI) initWidgets() {
 	g.initDeviceWidgets()
 	g.initWindowWidgets()
 	g.initDisplayWidgets()
+	g.initTunnelWidgets()
 	g.initVideoWidgets()
 	g.initAudioWidgets()
 	g.initControlWidgets()
@@ -144,6 +152,7 @@ func (g *GUI) buildOptionsPanel() *fyne.Container {
 		container.NewTabItem("Device", g.buildDeviceTab()),
 		container.NewTabItem("Window", g.buildWindowTab()),
 		container.NewTabItem("Display", g.buildDisplayTab()),
+		container.NewTabItem("Tunnel", g.buildTunnelTab()),
 		container.NewTabItem("Video", g.buildVideoEngineTab()),
 		container.NewTabItem("Audio", g.buildAudioEngineTab()),
 		container.NewTabItem("Control", g.buildControlTab()),

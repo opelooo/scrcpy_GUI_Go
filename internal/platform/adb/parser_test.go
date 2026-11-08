@@ -847,3 +847,67 @@ func TestConflictNewDisplayOmittedOnCameraSource(t *testing.T) {
 		t.Errorf("expected --new-display to be omitted when video-source is camera, got %q", joined)
 	}
 }
+
+func TestBuildScrcpyArgsTunnelHostAndPort(t *testing.T) {
+	opts := domain.ScrcpyOptions{
+		DeviceSerial: "DEV_TUN",
+		TunnelHost:   "192.168.1.5",
+		TunnelPort:   "27183",
+	}
+
+	args := BuildScrcpyArgs(opts)
+	joined := strings.Join(args, " ")
+	expectedFlags := []string{
+		"--tunnel-host=192.168.1.5",
+		"--tunnel-port=27183",
+	}
+
+	for _, flag := range expectedFlags {
+		if !strings.Contains(joined, flag) {
+			t.Errorf("expected %q in args, got %q", flag, joined)
+		}
+	}
+}
+
+func TestBuildScrcpyArgsForceAdbForwardStandalone(t *testing.T) {
+	opts := domain.ScrcpyOptions{
+		DeviceSerial:    "DEV_TUN",
+		ForceAdbForward: true,
+	}
+
+	args := BuildScrcpyArgs(opts)
+	joined := strings.Join(args, " ")
+
+	if !strings.Contains(joined, "--force-adb-forward") {
+		t.Errorf("expected --force-adb-forward in args, got %q", joined)
+	}
+}
+
+func TestConflictForceAdbForwardRedundantWithTunnelHost(t *testing.T) {
+	opts := domain.ScrcpyOptions{
+		DeviceSerial:    "DEV_TUN",
+		TunnelHost:      "192.168.1.5",
+		ForceAdbForward: true,
+	}
+
+	args := BuildScrcpyArgs(opts)
+	joined := strings.Join(args, " ")
+
+	if strings.Contains(joined, "--force-adb-forward") {
+		t.Errorf("expected --force-adb-forward to be omitted when tunnel-host is provided, got %q", joined)
+	}
+}
+
+func TestBuildScrcpyArgsPortRange(t *testing.T) {
+	opts := domain.ScrcpyOptions{
+		DeviceSerial: "DEV_TUN",
+		PortRange:    "27183:27199",
+	}
+
+	args := BuildScrcpyArgs(opts)
+	joined := strings.Join(args, " ")
+
+	if !strings.Contains(joined, "--port=27183:27199") {
+		t.Errorf("expected --port=27183:27199 in args, got %q", joined)
+	}
+}

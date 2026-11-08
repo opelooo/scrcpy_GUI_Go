@@ -265,18 +265,29 @@ func (c *Client) Pair(ip string, port int, code string) error {
 	return nil
 }
 
-// ExecuteScrcpy executes scrcpy asynchronously with the given arguments.
-func (c *Client) ExecuteScrcpy(args []string) error {
+// ExecuteScrcpyWithEnv executes scrcpy asynchronously with the given arguments and extra environment variables.
+func (c *Client) ExecuteScrcpyWithEnv(args []string, extraEnv []string) error {
 	cmd := exec.Command(c.ScrcpyPath, args...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
+	cmd.Env = os.Environ()
 	if runtime.GOOS == "linux" {
 		const sysSDL2 = "/usr/lib/x86_64-linux-gnu/libSDL2-2.0.so.0"
 		if fi, err := os.Stat(sysSDL2); err == nil && !fi.IsDir() {
-			cmd.Env = append(os.Environ(), "LD_PRELOAD="+sysSDL2)
+			cmd.Env = append(cmd.Env, "LD_PRELOAD="+sysSDL2)
+		}
+	}
+	for _, env := range extraEnv {
+		if strings.TrimSpace(env) != "" {
+			cmd.Env = append(cmd.Env, env)
 		}
 	}
 	return cmd.Start()
+}
+
+// ExecuteScrcpy executes scrcpy asynchronously with the given arguments.
+func (c *Client) ExecuteScrcpy(args []string) error {
+	return c.ExecuteScrcpyWithEnv(args, nil)
 }
 
 // GetScrcpyCapabilities queries scrcpy version and determines supported flags.

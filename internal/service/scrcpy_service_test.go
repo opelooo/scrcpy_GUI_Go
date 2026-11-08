@@ -14,6 +14,7 @@ type mockADBClient struct {
 	model         string
 	ip            string
 	executedArgs  []string
+	executedEnv   []string
 	tcpipPort     int
 	connectTarget string
 	disconnectTgt string
@@ -66,6 +67,12 @@ func (m *mockADBClient) Pair(ip string, port int, code string) error {
 
 func (m *mockADBClient) ExecuteScrcpy(args []string) error {
 	m.executedArgs = args
+	return nil
+}
+
+func (m *mockADBClient) ExecuteScrcpyWithEnv(args []string, extraEnv []string) error {
+	m.executedArgs = args
+	m.executedEnv = extraEnv
 	return nil
 }
 

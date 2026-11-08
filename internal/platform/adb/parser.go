@@ -428,10 +428,30 @@ func appendDisplayArgs(args []string, opts domain.ScrcpyOptions) []string {
 	return appendDisplayIMEPolicyArgs(args, opts)
 }
 
+func appendTunnelArgs(args []string, opts domain.ScrcpyOptions) []string {
+	hasTunnelHost := false
+	if host := strings.TrimSpace(opts.TunnelHost); host != "" {
+		args = append(args, fmt.Sprintf("--tunnel-host=%s", host))
+		hasTunnelHost = true
+	}
+	if port := strings.TrimSpace(opts.TunnelPort); port != "" && port != "0" {
+		args = append(args, fmt.Sprintf("--tunnel-port=%s", port))
+		hasTunnelHost = true
+	}
+	if pRange := strings.TrimSpace(opts.PortRange); pRange != "" {
+		args = append(args, fmt.Sprintf("--port=%s", pRange))
+	}
+	if opts.ForceAdbForward && !hasTunnelHost {
+		args = append(args, "--force-adb-forward")
+	}
+	return args
+}
+
 // BuildScrcpyArgs constructs the CLI arguments for scrcpy execution.
 func BuildScrcpyArgs(opts domain.ScrcpyOptions) []string {
 	var args []string
 	args = appendConnectionArgs(args, opts)
+	args = appendTunnelArgs(args, opts)
 	args = appendVideoArgs(args, opts)
 	args = appendCameraArgs(args, opts)
 	args = appendDisplayArgs(args, opts)

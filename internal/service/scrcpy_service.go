@@ -3,6 +3,7 @@ package service
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/opelooo/scrcpy_GUI_Go/internal/domain"
@@ -100,12 +101,20 @@ func (s *ScrcpyService) ConnectTCPIP(serial string) error {
 
 // LaunchScrcpy builds arguments and executes scrcpy asynchronously.
 func (s *ScrcpyService) LaunchScrcpy(opts domain.ScrcpyOptions) error {
-	if opts.DeviceSerial == "" && !opts.SelectUSB && !opts.SelectTCPIP && opts.TCPIPAddress == "" {
+	hasTarget := opts.DeviceSerial != "" || opts.SelectUSB || opts.SelectTCPIP || opts.TCPIPAddress != ""
+	if !hasTarget && opts.TunnelHost == "" && opts.ADBServerHost == "" {
 		return errors.New("please select device")
 	}
 
 	args := adb.BuildScrcpyArgs(opts)
-	return s.client.ExecuteScrcpy(args)
+	var extraEnv []string
+	if host := strings.TrimSpace(opts.ADBServerHost); host != "" {
+		if !strings.HasPrefix(host, "tcp:") {
+			host = "tcp:" + host
+		}
+		extraEnv = append(extraEnv, "ADB_SERVER_SOCKET="+host)
+	}
+	return s.client.ExecuteScrcpyWithEnv(args, extraEnv)
 }
 
 // DirectConnect connects to an arbitrary IP:port over wireless ADB and launches scrcpy.

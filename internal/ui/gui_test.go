@@ -216,4 +216,21 @@ func TestGUIInitialization(t *testing.T) {
 	if gui.displayIDEntry.Text != "" {
 		t.Errorf("expected displayIDEntry to be cleared when newDisplay is checked")
 	}
+
+	// Verify tunnel engine controls initialization
+	if gui.forceAdbForwardCheck.Checked {
+		t.Errorf("expected forceAdbForwardCheck to be unchecked initially")
+	}
+	if gui.tunnelHostEntry.Text != "" {
+		t.Errorf("expected empty tunnelHostEntry initially")
+	}
+	if gui.tunnelPortEntry.Text != "" {
+		t.Errorf("expected empty tunnelPortEntry initially")
+	}
+	if gui.adbServerHostEntry.Text != "" {
+		t.Errorf("expected empty adbServerHostEntry initially")
+	}
+	if gui.portRangeEntry.Text != "" {
+		t.Errorf("expected empty portRangeEntry initially")
+	}
 }

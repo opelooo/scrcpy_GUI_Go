@@ -11,15 +11,20 @@ A lightweight, modern graphical user interface for [scrcpy](https://github.com/G
 - **Automatic Tool Detection**: Automatically detects `adb` and `scrcpy` from system `PATH` or the executable's folder.
 - **Device Management**:
   - Automatically queries and lists connected Android devices (`adb devices`).
+  - Background auto-detection of device connection/disconnection.
+  - Transport badges: `[USB]` vs `[Wi-Fi]` visual indicators in the device list.
   - Double-click an attached device to immediately launch `scrcpy`.
   - Right-click context menu on any device:
     - **Show Device Info**: Displays device manufacturer and model.
     - **Show Device IP**: Displays device Wi-Fi IP address.
+    - **Disconnect Device**: Disconnects wireless device (`adb disconnect <target>`).
 - **Quick Action Buttons**:
   - **Refresh**: Rescans for attached devices.
   - **Info**: Shows device hardware details.
   - **Run**: Launches `scrcpy` with all selected options.
   - **TCP/IP**: Automates wireless connection over Wi-Fi (`adb tcpip 5555` $\rightarrow$ `adb connect <ip>:5555` $\rightarrow$ `scrcpy`).
+  - **Connect IP**: Direct TCP/IP connect dialog without needing initial USB cable (`scrcpy --tcpip=IP[:PORT]`, with optional `+IP` force reconnect).
+  - **Pair Device**: Android 11+ Wireless Debugging Pairing dialog (`adb pair <ip>:<port> <code>`).
 - **Customizable Options**:
   - **Video Bit Rate**: Slider and text field synced from 1M to 50M (default: `2M`).
   - **Max Mirroring Size**: Input field (default: `1024`).
@@ -75,6 +80,36 @@ A lightweight, modern graphical user interface for [scrcpy](https://github.com/G
      ```
    - **Windows**:
      Download the official scrcpy release containing `adb.exe` and `scrcpy.exe`. Put `scrcpy-gui.exe` in the same folder or add scrcpy to system `PATH`.
+
+---
+
+## Installation
+
+The installer automatically detects your operating system (Linux or Windows) and sets up the application with desktop shortcuts and system integration.
+
+### Linux / macOS
+```bash
+./install.sh
+# or via make:
+make install
+```
+- Installs binary to `~/.local/share/scrcpy-gui/scrcpy-gui`
+- Creates command symlink at `~/.local/bin/scrcpy-gui`
+- Installs application icon and desktop menu entry (`scrcpy-gui.desktop`)
+
+To uninstall:
+```bash
+./uninstall.sh
+# or:
+make uninstall
+```
+
+### Windows
+- **Via Command Prompt / File Explorer**: Double-click or run `install.bat`.
+- **Via Git Bash / MSYS2**: Run `./install.sh`.
+- Installs to `%LOCALAPPDATA%\scrcpy-gui`
+- Creates shortcuts on Desktop and Start Menu
+- Adds to User `PATH`
 
 ---
 

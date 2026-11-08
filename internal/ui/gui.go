@@ -175,13 +175,14 @@ func (g *GUI) buildUI() {
 	listHeader := widget.NewLabelWithStyle("Attached Devices", fyne.TextAlignLeading, fyne.TextStyle{Bold: true})
 	leftPanel := container.NewBorder(listHeader, nil, nil, nil, g.deviceList)
 
+	sidePanel := container.NewHBox(
+		container.NewGridWrap(fyne.NewSize(230, 520), leftPanel),
+		container.NewGridWrap(fyne.NewSize(125, 520), buttonPanel),
+	)
+
 	content := container.NewBorder(
-		nil, nil, nil, nil,
-		container.NewHBox(
-			container.NewGridWrap(fyne.NewSize(230, 390), leftPanel),
-			container.NewGridWrap(fyne.NewSize(125, 390), buttonPanel),
-			container.NewGridWrap(fyne.NewSize(480, 390), optionsPanel),
-		),
+		nil, nil, sidePanel, nil,
+		optionsPanel,
 	)
 
 	g.window.SetContent(content)

@@ -191,7 +191,7 @@ func appendControlArgs(args []string, opts domain.ScrcpyOptions) []string {
 	if opts.NoKeyRepeat {
 		args = append(args, "--no-key-repeat")
 	}
-	if sm := strings.TrimSpace(opts.ShortcutMod); sm != "" && sm != "default" && sm != "Default" {
+	if sm := strings.TrimSpace(opts.ShortcutMod); sm != "" && !strings.HasPrefix(strings.ToLower(sm), "default") {
 		args = append(args, fmt.Sprintf("--shortcut-mod=%s", sm))
 	}
 	if target := strings.TrimSpace(opts.PushTarget); target != "" && target != "/sdcard/Download/" {

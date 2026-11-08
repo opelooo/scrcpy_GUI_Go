@@ -232,6 +232,19 @@ func TestBuildScrcpyArgsControlDisabled(t *testing.T) {
 	}
 }
 
+func TestBuildScrcpyArgsShortcutModDefault(t *testing.T) {
+	opts := domain.ScrcpyOptions{
+		DeviceSerial: "DEV_MOD",
+		ShortcutMod:  "Default (Alt/Super)",
+	}
+
+	args := BuildScrcpyArgs(opts)
+	joined := strings.Join(args, " ")
+	if strings.Contains(joined, "--shortcut-mod") {
+		t.Errorf("expected --shortcut-mod to be omitted when Default (Alt/Super), got %q", joined)
+	}
+}
+
 func TestBuildScrcpyArgsV4L2Features(t *testing.T) {
 	opts := domain.ScrcpyOptions{
 		DeviceSerial: "DEV_V4L2",

@@ -101,6 +101,15 @@ func TestGUIInitialization(t *testing.T) {
 	if gui.noPlaybackCheck.Checked {
 		t.Errorf("expected noPlaybackCheck to be unchecked initially")
 	}
+	if gui.cameraIDEntry.Text != "" {
+		t.Errorf("expected empty initial cameraIDEntry, got %s", gui.cameraIDEntry.Text)
+	}
+	if gui.cameraARCombo.Selected != "Default" {
+		t.Errorf("expected Default camera AR, got %s", gui.cameraARCombo.Selected)
+	}
+	if gui.cameraHighSpeedCheck.Checked {
+		t.Errorf("expected cameraHighSpeedCheck to be unchecked initially")
+	}
 
 	// Verify audio engine controls initialization
 	if !gui.audioOnCheck.Checked {

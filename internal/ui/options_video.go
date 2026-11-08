@@ -1,14 +1,19 @@
 package ui
 
 import (
+	"runtime"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
 )
 
-func (g *GUI) initVideoWidgets() {
+func (g *GUI) initCameraWidgets() {
 	g.videoSourceCombo = widget.NewSelect([]string{"display (default)", "camera"}, nil)
 	g.videoSourceCombo.SetSelected("display (default)")
+
+	g.cameraIDEntry = widget.NewEntry()
+	g.cameraIDEntry.SetPlaceHolder("e.g. 0 or 1 (overrides facing)")
 
 	g.cameraFacingCombo = widget.NewSelect([]string{"front", "back", "external"}, nil)
 	g.cameraFacingCombo.SetSelected("front")
@@ -17,9 +22,17 @@ func (g *GUI) initVideoWidgets() {
 	g.cameraSizeEntry.SetText("1920x1080")
 	g.cameraSizeEntry.SetPlaceHolder("e.g. 1920x1080")
 
-	g.cameraFPSCombo = widget.NewSelect([]string{"Default", "60", "30"}, nil)
+	g.cameraARCombo = widget.NewSelect([]string{"Default", "sensor", "16:9", "4:3", "1.6"}, nil)
+	g.cameraARCombo.SetSelected("Default")
+
+	g.cameraFPSCombo = widget.NewSelect([]string{"Default", "60", "30", "120"}, nil)
 	g.cameraFPSCombo.SetSelected("Default")
 
+	g.cameraHighSpeedCheck = widget.NewCheck("High-Speed Capture (120/240 fps)", nil)
+	g.cameraHighSpeedCheck.SetChecked(false)
+}
+
+func (g *GUI) initVideoCodecWidgets() {
 	g.videoCodecCombo = widget.NewSelect([]string{"default", "h264", "h265", "av1", "vp8", "vp9"}, nil)
 	g.videoCodecCombo.SetSelected("default")
 
@@ -45,11 +58,22 @@ func (g *GUI) initVideoWidgets() {
 	g.noPlaybackCheck.SetChecked(false)
 }
 
+func (g *GUI) initVideoWidgets() {
+	g.initCameraWidgets()
+	g.initVideoCodecWidgets()
+}
+
 func (g *GUI) buildCameraRows() []fyne.CanvasObject {
 	srcRow := container.NewBorder(
 		nil, nil,
 		widget.NewLabel("video source:"),
 		container.NewGridWrap(fyne.NewSize(180, 36), g.videoSourceCombo),
+		nil,
+	)
+	idRow := container.NewBorder(
+		nil, nil,
+		widget.NewLabel("camera id:"),
+		container.NewGridWrap(fyne.NewSize(180, 36), g.cameraIDEntry),
 		nil,
 	)
 	facingRow := container.NewBorder(
@@ -64,10 +88,31 @@ func (g *GUI) buildCameraRows() []fyne.CanvasObject {
 		container.NewGridWrap(fyne.NewSize(180, 36), g.cameraSizeEntry),
 		nil,
 	)
-	return []fyne.CanvasObject{srcRow, facingRow, sizeRow}
+	arRow := container.NewBorder(
+		nil, nil,
+		widget.NewLabel("camera ar:"),
+		container.NewGridWrap(fyne.NewSize(180, 36), g.cameraARCombo),
+		nil,
+	)
+	fpsRow := container.NewBorder(
+		nil, nil,
+		widget.NewLabel("camera fps:"),
+		container.NewGridWrap(fyne.NewSize(180, 36), g.cameraFPSCombo),
+		nil,
+	)
+	return []fyne.CanvasObject{srcRow, idRow, facingRow, sizeRow, arRow, fpsRow, g.cameraHighSpeedCheck}
 }
 
 func (g *GUI) buildV4L2Rows() []fyne.CanvasObject {
+	if runtime.GOOS != "linux" {
+		notice := widget.NewLabelWithStyle(
+			"V4L2 Virtual Webcam is only supported on Linux",
+			fyne.TextAlignLeading,
+			fyne.TextStyle{Italic: true},
+		)
+		return []fyne.CanvasObject{notice}
+	}
+
 	sinkRow := container.NewBorder(
 		nil, nil,
 		widget.NewLabel("v4l2 sink:"),
@@ -118,7 +163,7 @@ func (g *GUI) buildVideoSettingsRows() []fyne.CanvasObject {
 }
 
 func (g *GUI) buildVideoEngineTab() fyne.CanvasObject {
-	items := make([]fyne.CanvasObject, 0, 12)
+	items := make([]fyne.CanvasObject, 0, 16)
 	items = append(items, g.buildCameraRows()...)
 	items = append(items, g.buildVideoSettingsRows()...)
 	items = append(items, g.buildV4L2Rows()...)

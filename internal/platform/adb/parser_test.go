@@ -1029,3 +1029,99 @@ func TestConflictOTGSuppressesDeviceShellCommands(t *testing.T) {
 		t.Errorf("expected --power-off-on-close to be suppressed in OTG mode, got %q", joined)
 	}
 }
+
+func TestBuildScrcpyArgsCameraWithExplicitID(t *testing.T) {
+	opts := domain.ScrcpyOptions{
+		DeviceSerial: "DEV_CAM",
+		VideoSource:  "camera",
+		CameraID:     "1",
+		CameraFacing: "front",
+	}
+
+	args := BuildScrcpyArgs(opts)
+	joined := strings.Join(args, " ")
+
+	if !strings.Contains(joined, "--camera-id=1") {
+		t.Errorf("expected --camera-id=1 in args, got %q", joined)
+	}
+	if strings.Contains(joined, "--camera-facing") {
+		t.Errorf("expected --camera-facing to be omitted when camera-id is set, got %q", joined)
+	}
+}
+
+func TestBuildScrcpyArgsCameraSizeOmitMaxSizeAndAR(t *testing.T) {
+	opts := domain.ScrcpyOptions{
+		DeviceSerial: "DEV_CAM",
+		VideoSource:  "camera",
+		CameraSize:   "1280x720",
+		CameraAR:     "16:9",
+		MaxSize:      "1024",
+	}
+
+	args := BuildScrcpyArgs(opts)
+	joined := strings.Join(args, " ")
+
+	if !strings.Contains(joined, "--camera-size=1280x720") {
+		t.Errorf("expected --camera-size=1280x720 in args, got %q", joined)
+	}
+	if strings.Contains(joined, "--camera-ar") {
+		t.Errorf("expected --camera-ar to be omitted when camera-size is set, got %q", joined)
+	}
+	if strings.Contains(joined, "-m 1024") {
+		t.Errorf("expected -m to be omitted when camera-size is set, got %q", joined)
+	}
+}
+
+func TestBuildScrcpyArgsCameraAspectratioAndHighSpeed(t *testing.T) {
+	opts := domain.ScrcpyOptions{
+		DeviceSerial:    "DEV_CAM",
+		VideoSource:     "camera",
+		CameraSize:      "",
+		CameraAR:        "16:9",
+		CameraHighSpeed: true,
+		MaxSize:         "1920",
+		CameraFPS:       "120",
+	}
+
+	args := BuildScrcpyArgs(opts)
+	joined := strings.Join(args, " ")
+
+	if !strings.Contains(joined, "--camera-ar=16:9") {
+		t.Errorf("expected --camera-ar=16:9 in args, got %q", joined)
+	}
+	if !strings.Contains(joined, "--camera-high-speed") {
+		t.Errorf("expected --camera-high-speed in args, got %q", joined)
+	}
+	if !strings.Contains(joined, "-m 1920") {
+		t.Errorf("expected -m 1920 with camera-ar, got %q", joined)
+	}
+	if !strings.Contains(joined, "--camera-fps=120") {
+		t.Errorf("expected --camera-fps=120 in args, got %q", joined)
+	}
+	if strings.Contains(joined, "--camera-size") {
+		t.Errorf("expected --camera-size to be omitted when camera-ar is used, got %q", joined)
+	}
+}
+
+func TestConflictCameraInOTGMode(t *testing.T) {
+	opts := domain.ScrcpyOptions{
+		DeviceSerial: "DEV_OTG",
+		OTGMode:      true,
+		VideoSource:  "camera",
+		CameraFacing: "back",
+		CameraSize:   "1920x1080",
+	}
+
+	args := BuildScrcpyArgs(opts)
+	joined := strings.Join(args, " ")
+
+	if !strings.Contains(joined, "--otg") {
+		t.Errorf("expected --otg in args, got %q", joined)
+	}
+	if strings.Contains(joined, "--video-source=camera") {
+		t.Errorf("expected camera video source to be suppressed in OTG mode, got %q", joined)
+	}
+	if strings.Contains(joined, "--camera-") {
+		t.Errorf("expected camera flags to be suppressed in OTG mode, got %q", joined)
+	}
+}

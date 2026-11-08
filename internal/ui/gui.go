@@ -50,11 +50,14 @@ type GUI struct {
 	startAppEntry         *widget.Entry
 
 	// Video Engine widgets
-	videoSourceCombo  *widget.Select
-	cameraFacingCombo *widget.Select
-	cameraSizeEntry   *widget.Entry
-	cameraFPSCombo    *widget.Select
-	videoCodecCombo   *widget.Select
+	videoSourceCombo     *widget.Select
+	cameraIDEntry        *widget.Entry
+	cameraFacingCombo    *widget.Select
+	cameraSizeEntry      *widget.Entry
+	cameraARCombo        *widget.Select
+	cameraFPSCombo       *widget.Select
+	cameraHighSpeedCheck *widget.Check
+	videoCodecCombo      *widget.Select
 	maxFPSCombo       *widget.Select
 	orientationCombo  *widget.Select
 	videoBufferEntry  *widget.Entry

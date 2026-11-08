@@ -71,9 +71,12 @@ type ScrcpyOptions struct {
 	V4L2Sink             string
 	V4L2Buffer           string
 	VideoSource          string
+	CameraID             string
 	CameraFacing         string
 	CameraSize           string
+	CameraAR             string
 	CameraFPS            string
+	CameraHighSpeed      bool
 	PreferText           bool
 	RawKeyEvents         bool
 	NoKeyRepeat          bool

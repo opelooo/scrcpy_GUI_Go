@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
+	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -106,18 +107,24 @@ func appendVideoAdvancedArgs(args []string, opts domain.ScrcpyOptions) []string 
 	if crop := strings.TrimSpace(opts.Crop); crop != "" {
 		args = append(args, fmt.Sprintf("--crop=%s", crop))
 	}
-	if sink := strings.TrimSpace(opts.V4L2Sink); sink != "" {
-		args = append(args, fmt.Sprintf("--v4l2-sink=%s", sink))
-	}
-	if vbuf := strings.TrimSuffix(strings.TrimSpace(opts.V4L2Buffer), "ms"); vbuf != "" {
-		args = append(args, fmt.Sprintf("--v4l2-buffer=%s", vbuf))
+	if runtime.GOOS == "linux" {
+		if sink := strings.TrimSpace(opts.V4L2Sink); sink != "" {
+			args = append(args, fmt.Sprintf("--v4l2-sink=%s", sink))
+		}
+		if vbuf := strings.TrimSuffix(strings.TrimSpace(opts.V4L2Buffer), "ms"); vbuf != "" {
+			args = append(args, fmt.Sprintf("--v4l2-buffer=%s", vbuf))
+		}
 	}
 	return args
 }
 
 func appendVideoArgs(args []string, opts domain.ScrcpyOptions) []string {
-	if strings.TrimSpace(opts.MaxSize) != "" && strings.TrimSpace(opts.VideoSource) != "camera" {
-		args = append(args, "-m", strings.TrimSpace(opts.MaxSize))
+	if strings.TrimSpace(opts.MaxSize) != "" {
+		isCamera := strings.TrimSpace(opts.VideoSource) == "camera"
+		hasCameraSize := strings.TrimSpace(opts.CameraSize) != ""
+		if !isCamera || (!hasCameraSize && strings.TrimSpace(opts.CameraAR) != "") {
+			args = append(args, "-m", strings.TrimSpace(opts.MaxSize))
+		}
 	}
 	if strings.TrimSpace(opts.BitRate) != "" {
 		args = append(args, "-b", strings.TrimSpace(opts.BitRate))
@@ -264,21 +271,32 @@ func appendRecordArgs(args []string, opts domain.ScrcpyOptions) []string {
 }
 
 func appendCameraArgs(args []string, opts domain.ScrcpyOptions) []string {
-	src := strings.TrimSpace(opts.VideoSource)
-	if src != "camera" {
+	if strings.TrimSpace(opts.VideoSource) != "camera" {
 		return args
 	}
 	args = append(args, "--video-source=camera")
-	if facing := strings.TrimSpace(opts.CameraFacing); facing != "" && facing != "default" && facing != "Default" {
+
+	if id := strings.TrimSpace(opts.CameraID); id != "" {
+		args = append(args, fmt.Sprintf("--camera-id=%s", id))
+	} else if facing := strings.TrimSpace(opts.CameraFacing); facing != "" && facing != "default" && facing != "Default" {
 		args = append(args, fmt.Sprintf("--camera-facing=%s", facing))
 	}
+
 	size := strings.TrimSpace(opts.CameraSize)
-	if size == "" {
-		size = "1920x1080"
+	ar := strings.TrimSpace(opts.CameraAR)
+	if size != "" {
+		args = append(args, fmt.Sprintf("--camera-size=%s", size))
+	} else if ar != "" && ar != "default" && ar != "Default" {
+		args = append(args, fmt.Sprintf("--camera-ar=%s", ar))
+	} else {
+		args = append(args, "--camera-size=1920x1080")
 	}
-	args = append(args, fmt.Sprintf("--camera-size=%s", size))
+
 	if fps := strings.TrimSpace(opts.CameraFPS); fps != "" && fps != "default" && fps != "Default" {
 		args = append(args, fmt.Sprintf("--camera-fps=%s", fps))
+	}
+	if opts.CameraHighSpeed {
+		args = append(args, "--camera-high-speed")
 	}
 	return args
 }

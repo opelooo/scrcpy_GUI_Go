@@ -67,8 +67,15 @@ func (g *GUI) collectScrcpyOptions() domain.ScrcpyOptions {
 		AudioDup:        g.audioDupCheck.Checked,
 		AudioCodec:      g.audioCodecCombo.Selected,
 		AudioBitRate:    g.audioBitRateCombo.Selected,
-		AudioBuffer:     g.audioBufferEntry.Text,
-		NoAudioPlayback: g.noAudioPlaybackCheck.Checked,
+		AudioBuffer:         g.audioBufferEntry.Text,
+		NoAudioPlayback:     g.noAudioPlaybackCheck.Checked,
+		NoControl:           g.noControlCheck.Checked,
+		KeyboardMode:        g.keyboardModeCombo.Selected,
+		MouseMode:           g.mouseModeCombo.Selected,
+		NoMouseHover:        g.noMouseHoverCheck.Checked,
+		NoClipboardAutosync: g.noClipboardAutosyncCheck.Checked,
+		LegacyPaste:         g.legacyPasteCheck.Checked,
+		PushTarget:          g.pushTargetEntry.Text,
 	}
 }
 

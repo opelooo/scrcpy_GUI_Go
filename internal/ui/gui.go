@@ -53,6 +53,15 @@ type GUI struct {
 	audioBitRateCombo    *widget.Select
 	audioBufferEntry     *widget.Entry
 	noAudioPlaybackCheck *widget.Check
+
+	// Control Engine widgets
+	noControlCheck           *widget.Check
+	keyboardModeCombo        *widget.Select
+	mouseModeCombo           *widget.Select
+	noMouseHoverCheck        *widget.Check
+	noClipboardAutosyncCheck *widget.Check
+	legacyPasteCheck         *widget.Check
+	pushTargetEntry          *widget.Entry
 }
 
 // NewGUI constructs the GUI and sets up the layout.
@@ -73,6 +82,7 @@ func (g *GUI) initWidgets() {
 	g.initBasicWidgets()
 	g.initVideoWidgets()
 	g.initAudioWidgets()
+	g.initControlWidgets()
 }
 
 func (g *GUI) buildOptionsPanel() *fyne.Container {
@@ -80,6 +90,7 @@ func (g *GUI) buildOptionsPanel() *fyne.Container {
 		container.NewTabItem("Basic & Rec", g.buildBasicTab()),
 		container.NewTabItem("Video", g.buildVideoEngineTab()),
 		container.NewTabItem("Audio", g.buildAudioEngineTab()),
+		container.NewTabItem("Control", g.buildControlTab()),
 	)
 	return container.NewBorder(
 		container.NewVBox(g.currDeviceLabel, widget.NewSeparator()),
@@ -104,7 +115,7 @@ func (g *GUI) buildUI() {
 		container.NewHBox(
 			container.NewGridWrap(fyne.NewSize(230, 360), leftPanel),
 			container.NewGridWrap(fyne.NewSize(125, 360), buttonPanel),
-			container.NewGridWrap(fyne.NewSize(420, 360), optionsPanel),
+			container.NewGridWrap(fyne.NewSize(450, 360), optionsPanel),
 		),
 	)
 

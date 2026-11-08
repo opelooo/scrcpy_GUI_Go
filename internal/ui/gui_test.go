@@ -112,4 +112,27 @@ func TestGUIInitialization(t *testing.T) {
 	if gui.noAudioPlaybackCheck.Checked {
 		t.Errorf("expected noAudioPlaybackCheck to be unchecked initially")
 	}
+
+	// Verify control engine controls initialization
+	if gui.noControlCheck.Checked {
+		t.Errorf("expected noControlCheck to be unchecked initially")
+	}
+	if gui.keyboardModeCombo.Selected != "default" {
+		t.Errorf("expected default keyboard mode, got %s", gui.keyboardModeCombo.Selected)
+	}
+	if gui.mouseModeCombo.Selected != "default" {
+		t.Errorf("expected default mouse mode, got %s", gui.mouseModeCombo.Selected)
+	}
+	if gui.noMouseHoverCheck.Checked {
+		t.Errorf("expected noMouseHoverCheck to be unchecked initially")
+	}
+	if gui.noClipboardAutosyncCheck.Checked {
+		t.Errorf("expected noClipboardAutosyncCheck to be unchecked initially")
+	}
+	if gui.legacyPasteCheck.Checked {
+		t.Errorf("expected legacyPasteCheck to be unchecked initially")
+	}
+	if gui.pushTargetEntry.Text != "/sdcard/Download/" {
+		t.Errorf("expected default push target to be /sdcard/Download/, got %s", gui.pushTargetEntry.Text)
+	}
 }

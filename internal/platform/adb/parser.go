@@ -129,6 +129,31 @@ func appendVideoArgs(args []string, opts domain.ScrcpyOptions) []string {
 	return appendVideoAdvancedArgs(args, opts)
 }
 
+func appendAudioArgs(args []string, opts domain.ScrcpyOptions) []string {
+	if !opts.AudioOn {
+		return append(args, "--no-audio")
+	}
+	if src := strings.TrimSpace(opts.AudioSource); src != "" && src != "default" && src != "output (default)" {
+		args = append(args, fmt.Sprintf("--audio-source=%s", src))
+	}
+	if opts.AudioDup {
+		args = append(args, "--audio-dup")
+	}
+	if codec := strings.TrimSpace(opts.AudioCodec); codec != "" && codec != "default" && codec != "opus (default)" {
+		args = append(args, fmt.Sprintf("--audio-codec=%s", codec))
+	}
+	if rate := strings.TrimSpace(opts.AudioBitRate); rate != "" && rate != "default" && rate != "Default" {
+		args = append(args, fmt.Sprintf("--audio-bit-rate=%s", rate))
+	}
+	if buf := strings.TrimSuffix(strings.TrimSpace(opts.AudioBuffer), "ms"); buf != "" {
+		args = append(args, fmt.Sprintf("--audio-buffer=%s", buf))
+	}
+	if opts.NoAudioPlayback {
+		args = append(args, "--no-audio-playback")
+	}
+	return args
+}
+
 func appendRecordArgs(args []string, opts domain.ScrcpyOptions) []string {
 	if opts.RecordVideo && opts.VideoFormat != "" {
 		ts := time.Now().Format("20060102_150405")
@@ -148,6 +173,7 @@ func BuildScrcpyArgs(opts domain.ScrcpyOptions) []string {
 	var args []string
 	args = appendConnectionArgs(args, opts)
 	args = appendVideoArgs(args, opts)
+	args = appendAudioArgs(args, opts)
 	args = appendRecordArgs(args, opts)
 	return args
 }

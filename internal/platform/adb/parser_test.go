@@ -133,3 +133,47 @@ func TestBuildScrcpyArgsVideoFeatures(t *testing.T) {
 		}
 	}
 }
+
+func TestBuildScrcpyArgsAudioFeatures(t *testing.T) {
+	opts := domain.ScrcpyOptions{
+		DeviceSerial:    "DEV_AUDIO",
+		AudioOn:         true,
+		AudioSource:     "mic",
+		AudioDup:        true,
+		AudioCodec:      "aac",
+		AudioBitRate:    "192K",
+		AudioBuffer:     "100ms",
+		NoAudioPlayback: true,
+	}
+
+	args := BuildScrcpyArgs(opts)
+	expectedSubstrings := []string{
+		"-s", "DEV_AUDIO",
+		"--audio-source=mic",
+		"--audio-dup",
+		"--audio-codec=aac",
+		"--audio-bit-rate=192K",
+		"--audio-buffer=100",
+		"--no-audio-playback",
+	}
+
+	joined := strings.Join(args, " ")
+	for _, sub := range expectedSubstrings {
+		if !strings.Contains(joined, sub) {
+			t.Errorf("expected args to contain %q, but got %q", sub, joined)
+		}
+	}
+}
+
+func TestBuildScrcpyArgsAudioDisabled(t *testing.T) {
+	opts := domain.ScrcpyOptions{
+		DeviceSerial: "DEV_NO_AUDIO",
+		AudioOn:      false,
+	}
+
+	args := BuildScrcpyArgs(opts)
+	joined := strings.Join(args, " ")
+	if !strings.Contains(joined, "--no-audio") {
+		t.Errorf("expected args to contain --no-audio, got %q", joined)
+	}
+}

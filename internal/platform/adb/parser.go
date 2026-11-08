@@ -114,7 +114,7 @@ func appendVideoAdvancedArgs(args []string, opts domain.ScrcpyOptions) []string 
 }
 
 func appendVideoArgs(args []string, opts domain.ScrcpyOptions) []string {
-	if strings.TrimSpace(opts.MaxSize) != "" {
+	if strings.TrimSpace(opts.MaxSize) != "" && strings.TrimSpace(opts.VideoSource) != "camera" {
 		args = append(args, "-m", strings.TrimSpace(opts.MaxSize))
 	}
 	if strings.TrimSpace(opts.BitRate) != "" {

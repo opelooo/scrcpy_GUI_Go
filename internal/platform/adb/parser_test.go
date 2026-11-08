@@ -281,12 +281,16 @@ func TestBuildScrcpyArgsCameraDefaultSize(t *testing.T) {
 	opts := domain.ScrcpyOptions{
 		DeviceSerial: "DEV_CAM",
 		VideoSource:  "camera",
+		MaxSize:      "1024",
 	}
 
 	args := BuildScrcpyArgs(opts)
 	joined := strings.Join(args, " ")
 	if !strings.Contains(joined, "--camera-size=1920x1080") {
 		t.Errorf("expected default camera size 1920x1080, got %q", joined)
+	}
+	if strings.Contains(joined, "-m 1024") {
+		t.Errorf("expected -m to be omitted in camera mode, got %q", joined)
 	}
 }
 

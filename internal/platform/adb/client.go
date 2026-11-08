@@ -268,6 +268,8 @@ func (c *Client) Pair(ip string, port int, code string) error {
 // ExecuteScrcpy executes scrcpy asynchronously with the given arguments.
 func (c *Client) ExecuteScrcpy(args []string) error {
 	cmd := exec.Command(c.ScrcpyPath, args...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
 	if runtime.GOOS == "linux" {
 		const sysSDL2 = "/usr/lib/x86_64-linux-gnu/libSDL2-2.0.so.0"
 		if fi, err := os.Stat(sysSDL2); err == nil && !fi.IsDir() {

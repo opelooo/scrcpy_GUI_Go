@@ -7,10 +7,18 @@ import (
 )
 
 func (g *GUI) initControlWidgets() {
-	g.noControlCheck = widget.NewCheck("Read-Only (Disable Control)", nil)
+	g.noControlCheck = widget.NewCheck("Read-Only (Disable Control)", func(checked bool) {
+		if checked && g.otgModeCheck != nil && g.otgModeCheck.Checked {
+			g.otgModeCheck.SetChecked(false)
+		}
+	})
 	g.noControlCheck.SetChecked(false)
 
-	g.otgModeCheck = widget.NewCheck("OTG Mode (Hardware KBM via USB)", nil)
+	g.otgModeCheck = widget.NewCheck("OTG Mode (Hardware KBM via USB)", func(checked bool) {
+		if checked && g.noControlCheck != nil && g.noControlCheck.Checked {
+			g.noControlCheck.SetChecked(false)
+		}
+	})
 	g.otgModeCheck.SetChecked(false)
 
 	g.keyboardModeCombo = widget.NewSelect([]string{"default", "uhid", "aoa", "disabled"}, nil)
@@ -28,10 +36,18 @@ func (g *GUI) initControlWidgets() {
 	g.pushTargetEntry = widget.NewEntry()
 	g.pushTargetEntry.SetText("/sdcard/Download/")
 
-	g.preferTextCheck = widget.NewCheck("Prefer Text Injection (Accents/Symbols)", nil)
+	g.preferTextCheck = widget.NewCheck("Prefer Text Injection (Accents/Symbols)", func(checked bool) {
+		if checked && g.rawKeyEventsCheck != nil && g.rawKeyEventsCheck.Checked {
+			g.rawKeyEventsCheck.SetChecked(false)
+		}
+	})
 	g.preferTextCheck.SetChecked(false)
 
-	g.rawKeyEventsCheck = widget.NewCheck("Raw Key Events (Game/WASD Mode)", nil)
+	g.rawKeyEventsCheck = widget.NewCheck("Raw Key Events (Game/WASD Mode)", func(checked bool) {
+		if checked && g.preferTextCheck != nil && g.preferTextCheck.Checked {
+			g.preferTextCheck.SetChecked(false)
+		}
+	})
 	g.rawKeyEventsCheck.SetChecked(false)
 
 	g.noKeyRepeatCheck = widget.NewCheck("Disable Key Repeat on Hold", nil)

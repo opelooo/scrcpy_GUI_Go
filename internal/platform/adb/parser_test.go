@@ -138,7 +138,7 @@ func TestBuildScrcpyArgsAudioFeatures(t *testing.T) {
 	opts := domain.ScrcpyOptions{
 		DeviceSerial:    "DEV_AUDIO",
 		AudioOn:         true,
-		AudioSource:     "mic",
+		AudioSource:     "playback",
 		AudioDup:        true,
 		AudioCodec:      "aac",
 		AudioBitRate:    "192K",
@@ -149,7 +149,7 @@ func TestBuildScrcpyArgsAudioFeatures(t *testing.T) {
 	args := BuildScrcpyArgs(opts)
 	expectedSubstrings := []string{
 		"-s", "DEV_AUDIO",
-		"--audio-source=mic",
+		"--audio-source=playback",
 		"--audio-dup",
 		"--audio-codec=aac",
 		"--audio-bit-rate=192K",
@@ -188,7 +188,6 @@ func TestBuildScrcpyArgsControlFeatures(t *testing.T) {
 		NoClipboardAutosync: true,
 		LegacyPaste:         true,
 		PushTarget:          "/sdcard/Movies/",
-		PreferText:          true,
 		RawKeyEvents:        true,
 		NoKeyRepeat:         true,
 		ShortcutMod:         "lctrl+lalt",
@@ -204,7 +203,6 @@ func TestBuildScrcpyArgsControlFeatures(t *testing.T) {
 		"--no-clipboard-autosync",
 		"--legacy-paste",
 		"--push-target=/sdcard/Movies/",
-		"--prefer-text",
 		"--raw-key-events",
 		"--no-key-repeat",
 		"--shortcut-mod=lctrl+lalt",
@@ -364,5 +362,86 @@ func TestBuildScrcpyArgsCameraDisabled(t *testing.T) {
 	joined := strings.Join(args, " ")
 	if strings.Contains(joined, "--video-source=camera") || strings.Contains(joined, "--camera-facing") {
 		t.Errorf("expected camera flags to be omitted when VideoSource is display, got %q", joined)
+	}
+}
+
+func TestConflictPreferTextAndRawKeyEvents(t *testing.T) {
+	opts := domain.ScrcpyOptions{
+		DeviceSerial: "DEV",
+		PreferText:   true,
+		RawKeyEvents: true,
+	}
+
+	args := BuildScrcpyArgs(opts)
+	joined := strings.Join(args, " ")
+	if !strings.Contains(joined, "--raw-key-events") {
+		t.Errorf("expected --raw-key-events to be present, got %q", joined)
+	}
+	if strings.Contains(joined, "--prefer-text") {
+		t.Errorf("expected --prefer-text to be omitted when raw-key-events is set, got %q", joined)
+	}
+}
+
+func TestConflictOTGAndNoControl(t *testing.T) {
+	opts := domain.ScrcpyOptions{
+		DeviceSerial: "DEV",
+		OTGMode:      true,
+		NoControl:    true,
+	}
+
+	args := BuildScrcpyArgs(opts)
+	joined := strings.Join(args, " ")
+	if !strings.Contains(joined, "--otg") {
+		t.Errorf("expected --otg to be present, got %q", joined)
+	}
+	if strings.Contains(joined, "--no-control") {
+		t.Errorf("expected --no-control to be omitted in OTG mode, got %q", joined)
+	}
+}
+
+func TestConflictOTGOverNetwork(t *testing.T) {
+	opts := domain.ScrcpyOptions{
+		DeviceSerial: "192.168.1.10:5555",
+		OTGMode:      true,
+	}
+
+	args := BuildScrcpyArgs(opts)
+	joined := strings.Join(args, " ")
+	if strings.Contains(joined, "--otg") {
+		t.Errorf("expected --otg to be omitted over network, got %q", joined)
+	}
+}
+
+func TestConflictAudioDupPlaybackForced(t *testing.T) {
+	opts := domain.ScrcpyOptions{
+		DeviceSerial: "DEV",
+		AudioOn:      true,
+		AudioSource:  "output",
+		AudioDup:     true,
+	}
+
+	args := BuildScrcpyArgs(opts)
+	joined := strings.Join(args, " ")
+	if !strings.Contains(joined, "--audio-source=playback") {
+		t.Errorf("expected --audio-source=playback when audio-dup is set, got %q", joined)
+	}
+	if !strings.Contains(joined, "--audio-dup") {
+		t.Errorf("expected --audio-dup to be present, got %q", joined)
+	}
+}
+
+func TestConflictRecordWhenMediaDisabled(t *testing.T) {
+	opts := domain.ScrcpyOptions{
+		DeviceSerial: "DEV",
+		VideoOn:      false,
+		AudioOn:      false,
+		RecordVideo:  true,
+		VideoFormat:  "mp4",
+	}
+
+	args := BuildScrcpyArgs(opts)
+	joined := strings.Join(args, " ")
+	if strings.Contains(joined, "--record") {
+		t.Errorf("expected --record to be omitted when both video and audio are off, got %q", joined)
 	}
 }

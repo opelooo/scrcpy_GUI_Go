@@ -139,7 +139,11 @@ func appendAudioArgs(args []string, opts domain.ScrcpyOptions) []string {
 	if !opts.AudioOn {
 		return append(args, "--no-audio")
 	}
-	if src := strings.TrimSpace(opts.AudioSource); src != "" && src != "default" && src != "output (default)" {
+	src := strings.TrimSpace(opts.AudioSource)
+	if opts.AudioDup {
+		src = "playback"
+	}
+	if src != "" && src != "default" && src != "output (default)" {
 		args = append(args, fmt.Sprintf("--audio-source=%s", src))
 	}
 	if opts.AudioDup {
@@ -161,10 +165,10 @@ func appendAudioArgs(args []string, opts domain.ScrcpyOptions) []string {
 }
 
 func appendControlArgs(args []string, opts domain.ScrcpyOptions) []string {
-	if opts.OTGMode {
+	isNetwork := opts.SelectTCPIP || opts.TCPIPAddress != "" || strings.Contains(opts.DeviceSerial, ":")
+	if opts.OTGMode && !isNetwork {
 		args = append(args, "--otg")
-	}
-	if opts.NoControl {
+	} else if opts.NoControl {
 		return append(args, "--no-control")
 	}
 	if kbd := strings.TrimSpace(opts.KeyboardMode); kbd != "" && kbd != "default" && kbd != "Default" {
@@ -185,11 +189,10 @@ func appendControlArgs(args []string, opts domain.ScrcpyOptions) []string {
 	if opts.LegacyPaste {
 		args = append(args, "--legacy-paste")
 	}
-	if opts.PreferText {
-		args = append(args, "--prefer-text")
-	}
 	if opts.RawKeyEvents {
 		args = append(args, "--raw-key-events")
+	} else if opts.PreferText {
+		args = append(args, "--prefer-text")
 	}
 	if opts.NoKeyRepeat {
 		args = append(args, "--no-key-repeat")
@@ -204,6 +207,9 @@ func appendControlArgs(args []string, opts domain.ScrcpyOptions) []string {
 }
 
 func appendRecordArgs(args []string, opts domain.ScrcpyOptions) []string {
+	if !opts.VideoOn && !opts.AudioOn {
+		return args
+	}
 	if opts.RecordVideo && opts.VideoFormat != "" {
 		ts := time.Now().Format("20060102_150405")
 		filename := fmt.Sprintf("scrcpy_record_%s.%s", ts, opts.VideoFormat)

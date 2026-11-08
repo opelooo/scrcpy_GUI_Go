@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"strings"
 	"testing"
 
 	"fyne.io/fyne/v2/test"
@@ -247,5 +248,35 @@ func TestGUIInitialization(t *testing.T) {
 	}
 	if gui.portRangeEntry.Text != "" {
 		t.Errorf("expected empty portRangeEntry initially")
+	}
+}
+
+func TestShortcutsCheatsheetHelpers(t *testing.T) {
+	if resolveActiveModifier("Default (Alt/Super)") != "Alt/Super" {
+		t.Errorf("expected Alt/Super for default, got %s", resolveActiveModifier("Default (Alt/Super)"))
+	}
+	if resolveActiveModifier("rctrl") != "rctrl" {
+		t.Errorf("expected rctrl, got %s", resolveActiveModifier("rctrl"))
+	}
+	if resolveActiveModifier("") != "Alt/Super" {
+		t.Errorf("expected Alt/Super for empty, got %s", resolveActiveModifier(""))
+	}
+
+	shortcuts := getScrcpyShortcuts("rctrl")
+	if len(shortcuts) == 0 {
+		t.Fatalf("expected non-empty shortcuts list")
+	}
+
+	foundFullscreen := false
+	for _, it := range shortcuts {
+		if it.Action == "Switch Fullscreen" {
+			foundFullscreen = true
+			if !strings.Contains(it.KeySequence, "rctrl + f") {
+				t.Errorf("expected rctrl + f in shortcut keysequence, got %s", it.KeySequence)
+			}
+		}
+	}
+	if !foundFullscreen {
+		t.Errorf("expected Switch Fullscreen shortcut in list")
 	}
 }

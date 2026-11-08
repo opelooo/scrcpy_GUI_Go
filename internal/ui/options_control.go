@@ -16,7 +16,16 @@ func (g *GUI) initControlCombos() {
 	g.gamepadModeCombo = widget.NewSelect([]string{"default", "uhid", "aoa", "disabled"}, nil)
 	g.gamepadModeCombo.SetSelected("default")
 
-	g.shortcutModCombo = widget.NewSelect([]string{"Default (Alt/Super)", "lctrl+lalt", "rctrl", "lalt", "lsuper"}, nil)
+	g.shortcutModCombo = widget.NewSelect([]string{
+		"Default (Alt/Super)",
+		"rctrl",
+		"lctrl+lalt",
+		"lalt",
+		"ralt",
+		"lsuper",
+		"rsuper",
+		"lctrl+lsuper",
+	}, nil)
 	g.shortcutModCombo.SetSelected("Default (Alt/Super)")
 
 	g.pushTargetEntry = widget.NewEntry()
@@ -117,10 +126,16 @@ func (g *GUI) buildControlModeRows() []fyne.CanvasObject {
 		container.NewGridWrap(fyne.NewSize(120, 36), g.gamepadModeCombo),
 		nil,
 	)
+	cheatsheetBtn := widget.NewButton("Shortcuts Cheatsheet", func() {
+		g.showShortcutsCheatsheetDialog()
+	})
 	modRow := container.NewBorder(
 		nil, nil,
 		widget.NewLabel("shortcut mod:"),
-		container.NewGridWrap(fyne.NewSize(180, 36), g.shortcutModCombo),
+		container.NewHBox(
+			container.NewGridWrap(fyne.NewSize(160, 36), g.shortcutModCombo),
+			cheatsheetBtn,
+		),
 		nil,
 	)
 	pushRow := container.NewBorder(

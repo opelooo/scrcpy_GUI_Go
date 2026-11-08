@@ -241,6 +241,30 @@ func TestBuildScrcpyArgsShortcutModDefault(t *testing.T) {
 	}
 }
 
+func TestBuildScrcpyArgsShortcutModVariants(t *testing.T) {
+	testCases := []struct {
+		mod      string
+		expected string
+	}{
+		{"rctrl", "--shortcut-mod=rctrl"},
+		{"lctrl+lalt", "--shortcut-mod=lctrl+lalt"},
+		{"lctrl+lsuper", "--shortcut-mod=lctrl+lsuper"},
+		{"lctrl+lalt,rctrl", "--shortcut-mod=lctrl+lalt,rctrl"},
+	}
+
+	for _, tc := range testCases {
+		opts := domain.ScrcpyOptions{
+			DeviceSerial: "DEV_MOD",
+			ShortcutMod:  tc.mod,
+		}
+		args := BuildScrcpyArgs(opts)
+		joined := strings.Join(args, " ")
+		if !strings.Contains(joined, tc.expected) {
+			t.Errorf("for modifier %q, expected %q in args, got %q", tc.mod, tc.expected, joined)
+		}
+	}
+}
+
 func TestBuildScrcpyArgsGamepadFeatures(t *testing.T) {
 	testCases := []struct {
 		mode     string

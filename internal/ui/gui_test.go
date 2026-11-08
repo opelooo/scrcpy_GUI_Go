@@ -78,4 +78,38 @@ func TestGUIInitialization(t *testing.T) {
 	if lbl.Text != "[Wi-Fi] 192.168.1.99:5555" {
 		t.Errorf("expected [Wi-Fi] 192.168.1.99:5555, got %s", lbl.Text)
 	}
+
+	// Verify video engine controls initialization
+	if gui.videoCodecCombo.Selected != "default" {
+		t.Errorf("expected default codec, got %s", gui.videoCodecCombo.Selected)
+	}
+	if gui.maxFPSCombo.Selected != "Default" {
+		t.Errorf("expected Default max FPS, got %s", gui.maxFPSCombo.Selected)
+	}
+	if gui.orientationCombo.Selected != "Default" {
+		t.Errorf("expected Default orientation, got %s", gui.orientationCombo.Selected)
+	}
+	if gui.noPlaybackCheck.Checked {
+		t.Errorf("expected noPlaybackCheck to be unchecked initially")
+	}
+
+	// Verify audio engine controls initialization
+	if !gui.audioOnCheck.Checked {
+		t.Errorf("expected audioOnCheck to be checked initially")
+	}
+	if gui.audioSourceCombo.Selected != "output" {
+		t.Errorf("expected default audio source to be output, got %s", gui.audioSourceCombo.Selected)
+	}
+	if gui.audioCodecCombo.Selected != "opus" {
+		t.Errorf("expected default audio codec to be opus, got %s", gui.audioCodecCombo.Selected)
+	}
+	if gui.audioBitRateCombo.Selected != "Default" {
+		t.Errorf("expected default audio bitrate to be Default, got %s", gui.audioBitRateCombo.Selected)
+	}
+	if gui.audioDupCheck.Checked {
+		t.Errorf("expected audioDupCheck to be unchecked initially")
+	}
+	if gui.noAudioPlaybackCheck.Checked {
+		t.Errorf("expected noAudioPlaybackCheck to be unchecked initially")
+	}
 }

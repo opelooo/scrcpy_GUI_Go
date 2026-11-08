@@ -44,6 +44,12 @@ type ScrcpyOptions struct {
 	SelectUSB    bool
 	SelectTCPIP  bool
 	TCPIPAddress string
+	MaxFPS       string
+	VideoCodec   string
+	Orientation  string
+	VideoBuffer  string
+	Crop         string
+	NoPlayback   bool
 }
 
 // ADBClient defines the low-level ADB/scrcpy integration interface.

@@ -72,19 +72,42 @@ func ParseDeviceIP(output string) string {
 	return ""
 }
 
-// BuildScrcpyArgs constructs the CLI arguments for scrcpy execution.
-func BuildScrcpyArgs(opts domain.ScrcpyOptions) []string {
-	var args []string
+func appendConnectionArgs(args []string, opts domain.ScrcpyOptions) []string {
 	if opts.TCPIPAddress != "" {
-		args = append(args, fmt.Sprintf("--tcpip=%s", opts.TCPIPAddress))
-	} else if opts.SelectUSB {
-		args = append(args, "-d")
-	} else if opts.SelectTCPIP {
-		args = append(args, "-e")
-	} else if opts.DeviceSerial != "" {
-		args = append(args, "-s", opts.DeviceSerial)
+		return append(args, fmt.Sprintf("--tcpip=%s", opts.TCPIPAddress))
 	}
+	if opts.SelectUSB {
+		return append(args, "-d")
+	}
+	if opts.SelectTCPIP {
+		return append(args, "-e")
+	}
+	if opts.DeviceSerial != "" {
+		return append(args, "-s", opts.DeviceSerial)
+	}
+	return args
+}
 
+func appendVideoAdvancedArgs(args []string, opts domain.ScrcpyOptions) []string {
+	if fps := strings.TrimSpace(opts.MaxFPS); fps != "" && fps != "Default" {
+		args = append(args, fmt.Sprintf("--max-fps=%s", fps))
+	}
+	if codec := strings.TrimSpace(opts.VideoCodec); codec != "" && codec != "default" && codec != "h264 (default)" {
+		args = append(args, fmt.Sprintf("--video-codec=%s", codec))
+	}
+	if orient := strings.TrimSpace(opts.Orientation); orient != "" && orient != "default" && orient != "Default" {
+		args = append(args, fmt.Sprintf("--orientation=%s", orient))
+	}
+	if buf := strings.TrimSuffix(strings.TrimSpace(opts.VideoBuffer), "ms"); buf != "" {
+		args = append(args, fmt.Sprintf("--video-buffer=%s", buf))
+	}
+	if crop := strings.TrimSpace(opts.Crop); crop != "" {
+		args = append(args, fmt.Sprintf("--crop=%s", crop))
+	}
+	return args
+}
+
+func appendVideoArgs(args []string, opts domain.ScrcpyOptions) []string {
 	if strings.TrimSpace(opts.MaxSize) != "" {
 		args = append(args, "-m", strings.TrimSpace(opts.MaxSize))
 	}
@@ -100,14 +123,31 @@ func BuildScrcpyArgs(opts domain.ScrcpyOptions) []string {
 	if opts.StayAwake {
 		args = append(args, "--stay-awake")
 	}
+	if opts.NoPlayback {
+		args = append(args, "--no-playback")
+	}
+	return appendVideoAdvancedArgs(args, opts)
+}
+
+func appendRecordArgs(args []string, opts domain.ScrcpyOptions) []string {
 	if opts.RecordVideo && opts.VideoFormat != "" {
 		ts := time.Now().Format("20060102_150405")
 		filename := fmt.Sprintf("scrcpy_record_%s.%s", ts, opts.VideoFormat)
-		args = append(args, fmt.Sprintf("--record=%s", filename))
-	} else if opts.RecordAudio && opts.AudioFormat != "" {
+		return append(args, fmt.Sprintf("--record=%s", filename))
+	}
+	if opts.RecordAudio && opts.AudioFormat != "" {
 		ts := time.Now().Format("20060102_150405")
 		filename := fmt.Sprintf("scrcpy_record_%s.%s", ts, opts.AudioFormat)
-		args = append(args, fmt.Sprintf("--record=%s", filename))
+		return append(args, fmt.Sprintf("--record=%s", filename))
 	}
+	return args
+}
+
+// BuildScrcpyArgs constructs the CLI arguments for scrcpy execution.
+func BuildScrcpyArgs(opts domain.ScrcpyOptions) []string {
+	var args []string
+	args = appendConnectionArgs(args, opts)
+	args = appendVideoArgs(args, opts)
+	args = appendRecordArgs(args, opts)
 	return args
 }

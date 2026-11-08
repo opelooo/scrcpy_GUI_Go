@@ -101,3 +101,35 @@ func TestBuildScrcpyArgsConnectionSelectors(t *testing.T) {
 		t.Errorf("expected -e flag, got %s", tcpipArgs)
 	}
 }
+
+func TestBuildScrcpyArgsVideoFeatures(t *testing.T) {
+	opts := domain.ScrcpyOptions{
+		DeviceSerial: "ABC456",
+		VideoOn:      true,
+		ScreenOn:     true,
+		MaxFPS:       "60",
+		VideoCodec:   "h265",
+		Orientation:  "90",
+		VideoBuffer:  "50ms",
+		Crop:         "1080:1920:0:0",
+		NoPlayback:   true,
+	}
+
+	args := BuildScrcpyArgs(opts)
+	expectedSubstrings := []string{
+		"-s", "ABC456",
+		"--max-fps=60",
+		"--video-codec=h265",
+		"--orientation=90",
+		"--video-buffer=50",
+		"--crop=1080:1920:0:0",
+		"--no-playback",
+	}
+
+	joined := strings.Join(args, " ")
+	for _, sub := range expectedSubstrings {
+		if !strings.Contains(joined, sub) {
+			t.Errorf("expected args to contain %q, but got %q", sub, joined)
+		}
+	}
+}

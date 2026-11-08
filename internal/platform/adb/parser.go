@@ -154,6 +154,31 @@ func appendAudioArgs(args []string, opts domain.ScrcpyOptions) []string {
 	return args
 }
 
+func appendControlArgs(args []string, opts domain.ScrcpyOptions) []string {
+	if opts.NoControl {
+		return append(args, "--no-control")
+	}
+	if kbd := strings.TrimSpace(opts.KeyboardMode); kbd != "" && kbd != "default" && kbd != "Default" {
+		args = append(args, fmt.Sprintf("--keyboard=%s", kbd))
+	}
+	if mouse := strings.TrimSpace(opts.MouseMode); mouse != "" && mouse != "default" && mouse != "Default" {
+		args = append(args, fmt.Sprintf("--mouse=%s", mouse))
+	}
+	if opts.NoMouseHover {
+		args = append(args, "--no-mouse-hover")
+	}
+	if opts.NoClipboardAutosync {
+		args = append(args, "--no-clipboard-autosync")
+	}
+	if opts.LegacyPaste {
+		args = append(args, "--legacy-paste")
+	}
+	if target := strings.TrimSpace(opts.PushTarget); target != "" && target != "/sdcard/Download/" {
+		args = append(args, fmt.Sprintf("--push-target=%s", target))
+	}
+	return args
+}
+
 func appendRecordArgs(args []string, opts domain.ScrcpyOptions) []string {
 	if opts.RecordVideo && opts.VideoFormat != "" {
 		ts := time.Now().Format("20060102_150405")
@@ -174,6 +199,7 @@ func BuildScrcpyArgs(opts domain.ScrcpyOptions) []string {
 	args = appendConnectionArgs(args, opts)
 	args = appendVideoArgs(args, opts)
 	args = appendAudioArgs(args, opts)
+	args = appendControlArgs(args, opts)
 	args = appendRecordArgs(args, opts)
 	return args
 }

@@ -56,7 +56,14 @@ type ScrcpyOptions struct {
 	AudioCodec      string
 	AudioBitRate    string
 	AudioBuffer     string
-	NoAudioPlayback bool
+	NoAudioPlayback      bool
+	NoControl            bool
+	KeyboardMode         string
+	MouseMode            string
+	NoMouseHover         bool
+	NoClipboardAutosync  bool
+	LegacyPaste          bool
+	PushTarget           string
 }
 
 // ADBClient defines the low-level ADB/scrcpy integration interface.

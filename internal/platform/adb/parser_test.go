@@ -177,3 +177,47 @@ func TestBuildScrcpyArgsAudioDisabled(t *testing.T) {
 		t.Errorf("expected args to contain --no-audio, got %q", joined)
 	}
 }
+
+func TestBuildScrcpyArgsControlFeatures(t *testing.T) {
+	opts := domain.ScrcpyOptions{
+		DeviceSerial:        "DEV_CTRL",
+		NoControl:           false,
+		KeyboardMode:        "uhid",
+		MouseMode:           "uhid",
+		NoMouseHover:        true,
+		NoClipboardAutosync: true,
+		LegacyPaste:         true,
+		PushTarget:          "/sdcard/Movies/",
+	}
+
+	args := BuildScrcpyArgs(opts)
+	expectedSubstrings := []string{
+		"-s", "DEV_CTRL",
+		"--keyboard=uhid",
+		"--mouse=uhid",
+		"--no-mouse-hover",
+		"--no-clipboard-autosync",
+		"--legacy-paste",
+		"--push-target=/sdcard/Movies/",
+	}
+
+	joined := strings.Join(args, " ")
+	for _, sub := range expectedSubstrings {
+		if !strings.Contains(joined, sub) {
+			t.Errorf("expected args to contain %q, but got %q", sub, joined)
+		}
+	}
+}
+
+func TestBuildScrcpyArgsControlDisabled(t *testing.T) {
+	opts := domain.ScrcpyOptions{
+		DeviceSerial: "DEV_RO",
+		NoControl:    true,
+	}
+
+	args := BuildScrcpyArgs(opts)
+	joined := strings.Join(args, " ")
+	if !strings.Contains(joined, "--no-control") {
+		t.Errorf("expected args to contain --no-control, got %q", joined)
+	}
+}

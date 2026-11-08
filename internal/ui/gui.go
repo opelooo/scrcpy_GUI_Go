@@ -83,6 +83,21 @@ type GUI struct {
 	noKeyRepeatCheck         *widget.Check
 	shortcutModCombo         *widget.Select
 	otgModeCheck             *widget.Check
+
+	// Window Engine widgets (window.md)
+	alwaysOnTopCheck             *widget.Check
+	fullscreenCheck              *widget.Check
+	windowBorderlessCheck        *widget.Check
+	disableScreensaverCheck      *widget.Check
+	noWindowCheck                *widget.Check
+	windowTitleEntry             *widget.Entry
+	windowXEntry                 *widget.Entry
+	windowYEntry                 *widget.Entry
+	windowWidthEntry             *widget.Entry
+	windowHeightEntry            *widget.Entry
+	noWindowAspectRatioLockCheck *widget.Check
+	backgroundColorEntry         *widget.Entry
+	renderFitCombo               *widget.Select
 }
 
 // NewGUI constructs the GUI and sets up the layout.
@@ -104,6 +119,7 @@ func NewGUI(a fyne.App, w fyne.Window, svc domain.DeviceService) *GUI {
 func (g *GUI) initWidgets() {
 	g.initBasicWidgets()
 	g.initDeviceWidgets()
+	g.initWindowWidgets()
 	g.initVideoWidgets()
 	g.initAudioWidgets()
 	g.initControlWidgets()
@@ -113,6 +129,7 @@ func (g *GUI) buildOptionsPanel() *fyne.Container {
 	tabs := container.NewAppTabs(
 		container.NewTabItem("Basic & Rec", g.buildBasicTab()),
 		container.NewTabItem("Device", g.buildDeviceTab()),
+		container.NewTabItem("Window", g.buildWindowTab()),
 		container.NewTabItem("Video", g.buildVideoEngineTab()),
 		container.NewTabItem("Audio", g.buildAudioEngineTab()),
 		container.NewTabItem("Control", g.buildControlTab()),

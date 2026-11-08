@@ -292,6 +292,60 @@ func ParseScrcpyVersion(output string) (int, int, int, error) {
 	return major, minor, patch, nil
 }
 
+func appendWindowGeometryArgs(args []string, opts domain.ScrcpyOptions) []string {
+	if x := strings.TrimSpace(opts.WindowX); x != "" {
+		args = append(args, fmt.Sprintf("--window-x=%s", x))
+	}
+	if y := strings.TrimSpace(opts.WindowY); y != "" {
+		args = append(args, fmt.Sprintf("--window-y=%s", y))
+	}
+	if w := strings.TrimSpace(opts.WindowWidth); w != "" {
+		args = append(args, fmt.Sprintf("--window-width=%s", w))
+	}
+	if h := strings.TrimSpace(opts.WindowHeight); h != "" {
+		args = append(args, fmt.Sprintf("--window-height=%s", h))
+	}
+	return args
+}
+
+func appendWindowAdvancedArgs(args []string, opts domain.ScrcpyOptions) []string {
+	if opts.NoWindowAspectRatioLock {
+		args = append(args, "--no-window-aspect-ratio-lock")
+	}
+	if bg := strings.TrimSpace(opts.BackgroundColor); bg != "" {
+		args = append(args, fmt.Sprintf("--background-color=%s", bg))
+	}
+	if fit := strings.TrimSpace(opts.RenderFit); fit != "" && fit != "default" && fit != "Default" {
+		args = append(args, fmt.Sprintf("--render-fit=%s", fit))
+	}
+	return args
+}
+
+func appendWindowArgs(args []string, opts domain.ScrcpyOptions) []string {
+	if opts.NoWindow {
+		return append(args, "--no-window")
+	}
+	if opts.AlwaysOnTop {
+		args = append(args, "--always-on-top")
+	}
+	if opts.Fullscreen {
+		args = append(args, "--fullscreen")
+	}
+	if opts.WindowBorderless {
+		args = append(args, "--window-borderless")
+	}
+	if opts.DisableScreensaver {
+		args = append(args, "--disable-screensaver")
+	}
+	if title := strings.TrimSpace(opts.WindowTitle); title != "" {
+		args = append(args, fmt.Sprintf("--window-title=%s", title))
+	}
+	if !opts.Fullscreen {
+		args = appendWindowGeometryArgs(args, opts)
+	}
+	return appendWindowAdvancedArgs(args, opts)
+}
+
 // BuildScrcpyArgs constructs the CLI arguments for scrcpy execution.
 func BuildScrcpyArgs(opts domain.ScrcpyOptions) []string {
 	var args []string
@@ -301,6 +355,7 @@ func BuildScrcpyArgs(opts domain.ScrcpyOptions) []string {
 	args = appendAudioArgs(args, opts)
 	args = appendControlArgs(args, opts)
 	args = appendDeviceArgs(args, opts)
+	args = appendWindowArgs(args, opts)
 	args = appendRecordArgs(args, opts)
 	return args
 }

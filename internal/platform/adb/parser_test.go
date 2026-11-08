@@ -554,3 +554,134 @@ func TestBuildScrcpyArgsDeviceFeaturesDefaults(t *testing.T) {
 		}
 	}
 }
+
+func TestBuildScrcpyArgsWindowFeatures(t *testing.T) {
+	opts := domain.ScrcpyOptions{
+		DeviceSerial:       "DEV_WINDOW",
+		AlwaysOnTop:        true,
+		Fullscreen:         true,
+		WindowBorderless:   true,
+		DisableScreensaver: true,
+		WindowTitle:        "My Phone Mirror",
+	}
+
+	args := BuildScrcpyArgs(opts)
+	joined := strings.Join(args, " ")
+	expectedFlags := []string{
+		"-s DEV_WINDOW",
+		"--always-on-top",
+		"--fullscreen",
+		"--window-borderless",
+		"--disable-screensaver",
+		"--window-title=My Phone Mirror",
+	}
+
+	for _, flag := range expectedFlags {
+		if !strings.Contains(joined, flag) {
+			t.Errorf("expected flag %q to be present, got %q", flag, joined)
+		}
+	}
+}
+
+func TestBuildScrcpyArgsWindowGeometry(t *testing.T) {
+	opts := domain.ScrcpyOptions{
+		DeviceSerial: "DEV_WINDOW",
+		WindowX:      "100",
+		WindowY:      "200",
+		WindowWidth:  "1280",
+		WindowHeight: "720",
+	}
+
+	args := BuildScrcpyArgs(opts)
+	joined := strings.Join(args, " ")
+	expectedFlags := []string{
+		"--window-x=100",
+		"--window-y=200",
+		"--window-width=1280",
+		"--window-height=720",
+	}
+
+	for _, flag := range expectedFlags {
+		if !strings.Contains(joined, flag) {
+			t.Errorf("expected geometry flag %q to be present, got %q", flag, joined)
+		}
+	}
+}
+
+func TestConflictNoWindowOverridesWindowArgs(t *testing.T) {
+	opts := domain.ScrcpyOptions{
+		DeviceSerial:       "DEV_WINDOW",
+		NoWindow:           true,
+		AlwaysOnTop:        true,
+		Fullscreen:         true,
+		WindowBorderless:   true,
+		DisableScreensaver: true,
+		WindowTitle:        "Should Be Ignored",
+		WindowWidth:        "1280",
+		WindowHeight:       "720",
+	}
+
+	args := BuildScrcpyArgs(opts)
+	joined := strings.Join(args, " ")
+
+	if !strings.Contains(joined, "--no-window") {
+		t.Errorf("expected --no-window to be present, got %q", joined)
+	}
+
+	prohibitedFlags := []string{
+		"--always-on-top",
+		"--fullscreen",
+		"--window-borderless",
+		"--window-title",
+		"--window-width",
+		"--window-height",
+	}
+
+	for _, flag := range prohibitedFlags {
+		if strings.Contains(joined, flag) {
+			t.Errorf("flag %q should be suppressed when --no-window is active, got %q", flag, joined)
+		}
+	}
+}
+
+func TestConflictFullscreenOverridesGeometry(t *testing.T) {
+	opts := domain.ScrcpyOptions{
+		DeviceSerial: "DEV_WINDOW",
+		Fullscreen:   true,
+		WindowWidth:  "1280",
+		WindowHeight: "720",
+	}
+
+	args := BuildScrcpyArgs(opts)
+	joined := strings.Join(args, " ")
+
+	if !strings.Contains(joined, "--fullscreen") {
+		t.Errorf("expected --fullscreen to be present, got %q", joined)
+	}
+	if strings.Contains(joined, "--window-width") || strings.Contains(joined, "--window-height") {
+		t.Errorf("window size flags should be suppressed when fullscreen is active, got %q", joined)
+	}
+}
+
+func TestBuildScrcpyArgsWindowAdvanced(t *testing.T) {
+	opts := domain.ScrcpyOptions{
+		DeviceSerial:            "DEV_WINDOW",
+		NoWindowAspectRatioLock: true,
+		BackgroundColor:         "#123456",
+		RenderFit:               "stretched",
+	}
+
+	args := BuildScrcpyArgs(opts)
+	joined := strings.Join(args, " ")
+	expectedFlags := []string{
+		"--no-window-aspect-ratio-lock",
+		"--background-color=#123456",
+		"--render-fit=stretched",
+	}
+
+	for _, flag := range expectedFlags {
+		if !strings.Contains(joined, flag) {
+			t.Errorf("expected advanced window flag %q, got %q", flag, joined)
+		}
+	}
+}

@@ -155,4 +155,30 @@ func TestGUIInitialization(t *testing.T) {
 	if gui.keepActiveCheck.Visible() {
 		t.Errorf("expected keepActiveCheck to be hidden on scrcpy 3.3.4")
 	}
+
+	// Verify window widgets and backward compatibility
+	if gui.alwaysOnTopCheck.Checked {
+		t.Errorf("expected alwaysOnTopCheck to be unchecked initially")
+	}
+	if gui.fullscreenCheck.Checked {
+		t.Errorf("expected fullscreenCheck to be unchecked initially")
+	}
+	if gui.noWindowCheck.Checked {
+		t.Errorf("expected noWindowCheck to be unchecked initially")
+	}
+	if gui.noWindowAspectRatioLockCheck.Visible() {
+		t.Errorf("expected noWindowAspectRatioLockCheck to be hidden on scrcpy 3.3.4")
+	}
+
+	// Test conflict callback: checking noWindow should uncheck fullscreen and alwaysOnTop
+	gui.fullscreenCheck.SetChecked(true)
+	gui.alwaysOnTopCheck.SetChecked(true)
+	gui.noWindowCheck.SetChecked(true)
+
+	if gui.fullscreenCheck.Checked {
+		t.Errorf("expected fullscreenCheck to be unchecked when noWindow is checked")
+	}
+	if gui.alwaysOnTopCheck.Checked {
+		t.Errorf("expected alwaysOnTopCheck to be unchecked when noWindow is checked")
+	}
 }

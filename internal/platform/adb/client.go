@@ -306,13 +306,18 @@ func (c *Client) GetScrcpyCapabilities() (domain.ScrcpyCapabilities, error) {
 
 	if major > 3 || (major == 3 && minor >= 4) {
 		caps.HasKeepActive = true
+		caps.HasWindowAdvanced = true
 		return caps, nil
 	}
 
 	cmdHelp := exec.Command(c.ScrcpyPath, "--help")
 	if outHelp, errHelp := cmdHelp.Output(); errHelp == nil {
-		if strings.Contains(string(outHelp), "--keep-active") {
+		helpText := string(outHelp)
+		if strings.Contains(helpText, "--keep-active") {
 			caps.HasKeepActive = true
+		}
+		if strings.Contains(helpText, "--render-fit") {
+			caps.HasWindowAdvanced = true
 		}
 	}
 

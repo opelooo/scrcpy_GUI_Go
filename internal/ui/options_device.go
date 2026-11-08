@@ -61,3 +61,4 @@ func (g *GUI) buildDeviceTab() *fyne.Container {
 		startAppRow,
 	)
 }
+

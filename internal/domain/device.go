@@ -81,16 +81,30 @@ type ScrcpyOptions struct {
 	NoPowerOn            bool
 	ScreenOffTimeout     string
 	StartApp             string
-	KeepActive           bool
+	KeepActive              bool
+	AlwaysOnTop             bool
+	Fullscreen              bool
+	WindowBorderless        bool
+	WindowTitle             string
+	WindowX                 string
+	WindowY                 string
+	WindowWidth             string
+	WindowHeight            string
+	DisableScreensaver      bool
+	NoWindow                bool
+	NoWindowAspectRatioLock bool
+	BackgroundColor         string
+	RenderFit               string
 }
 
 // ScrcpyCapabilities defines supported scrcpy binary capabilities for backward compatibility.
 type ScrcpyCapabilities struct {
-	VersionRaw    string
-	Major         int
-	Minor         int
-	Patch         int
-	HasKeepActive bool
+	VersionRaw        string
+	Major             int
+	Minor             int
+	Patch             int
+	HasKeepActive     bool
+	HasWindowAdvanced bool
 }
 
 // ADBClient defines the low-level ADB/scrcpy integration interface.

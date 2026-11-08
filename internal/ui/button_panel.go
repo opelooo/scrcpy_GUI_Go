@@ -92,8 +92,21 @@ func (g *GUI) collectScrcpyOptions() domain.ScrcpyOptions {
 		PowerOffOnClose:     g.powerOffOnCloseCheck.Checked,
 		NoPowerOn:           g.noPowerOnCheck.Checked,
 		KeepActive:          g.keepActiveCheck.Visible() && g.keepActiveCheck.Checked,
-		ScreenOffTimeout:    g.screenOffTimeoutEntry.Text,
-		StartApp:            g.startAppEntry.Text,
+		ScreenOffTimeout:        g.screenOffTimeoutEntry.Text,
+		StartApp:                g.startAppEntry.Text,
+		AlwaysOnTop:             g.alwaysOnTopCheck.Checked,
+		Fullscreen:              g.fullscreenCheck.Checked,
+		WindowBorderless:        g.windowBorderlessCheck.Checked,
+		WindowTitle:             g.windowTitleEntry.Text,
+		WindowX:                 g.windowXEntry.Text,
+		WindowY:                 g.windowYEntry.Text,
+		WindowWidth:             g.windowWidthEntry.Text,
+		WindowHeight:            g.windowHeightEntry.Text,
+		DisableScreensaver:      g.disableScreensaverCheck.Checked,
+		NoWindow:                g.noWindowCheck.Checked,
+		NoWindowAspectRatioLock: g.noWindowAspectRatioLockCheck.Visible() && g.noWindowAspectRatioLockCheck.Checked,
+		BackgroundColor:         g.backgroundColorEntry.Text,
+		RenderFit:               g.renderFitCombo.Selected,
 	}
 }
 

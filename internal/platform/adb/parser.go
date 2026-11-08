@@ -208,9 +208,11 @@ func appendCameraArgs(args []string, opts domain.ScrcpyOptions) []string {
 	if facing := strings.TrimSpace(opts.CameraFacing); facing != "" && facing != "default" && facing != "Default" {
 		args = append(args, fmt.Sprintf("--camera-facing=%s", facing))
 	}
-	if size := strings.TrimSpace(opts.CameraSize); size != "" {
-		args = append(args, fmt.Sprintf("--camera-size=%s", size))
+	size := strings.TrimSpace(opts.CameraSize)
+	if size == "" {
+		size = "1920x1080"
 	}
+	args = append(args, fmt.Sprintf("--camera-size=%s", size))
 	if fps := strings.TrimSpace(opts.CameraFPS); fps != "" && fps != "default" && fps != "Default" {
 		args = append(args, fmt.Sprintf("--camera-fps=%s", fps))
 	}

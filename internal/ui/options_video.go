@@ -14,6 +14,7 @@ func (g *GUI) initVideoWidgets() {
 	g.cameraFacingCombo.SetSelected("front")
 
 	g.cameraSizeEntry = widget.NewEntry()
+	g.cameraSizeEntry.SetText("1920x1080")
 	g.cameraSizeEntry.SetPlaceHolder("e.g. 1920x1080")
 
 	g.cameraFPSCombo = widget.NewSelect([]string{"Default", "60", "30"}, nil)
